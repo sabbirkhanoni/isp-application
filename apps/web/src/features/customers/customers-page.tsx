@@ -453,7 +453,7 @@ export function CustomersPage() {
                             >
                               {c.status === 'ACTIVE' && c.online === true ? (
                                 <span className="relative flex items-center justify-center size-5 rounded-full bg-amber-50 border border-amber-300 shadow-2xs">
-                                  <Lightbulb className="size-3.5 text-amber-600 fill-amber-400 animate-pulse" />
+                                  <Lightbulb className="size-3.5 text-amber-600 fill-amber-400" />
                                 </span>
                               ) : (
                                 <span className="relative flex items-center justify-center size-5 rounded-full bg-slate-100 border border-slate-200">
@@ -632,7 +632,7 @@ export function CustomersPage() {
                           >
                             {c.status === 'ACTIVE' && c.online === true ? (
                               <span className="relative flex items-center justify-center size-5 rounded-full bg-amber-50 border border-amber-300 shadow-2xs">
-                                <Lightbulb className="size-3.5 text-amber-600 fill-amber-400 animate-pulse" />
+                                <Lightbulb className="size-3.5 text-amber-600 fill-amber-400" />
                               </span>
                             ) : (
                               <span className="relative flex items-center justify-center size-5 rounded-full bg-slate-100 border border-slate-200">
