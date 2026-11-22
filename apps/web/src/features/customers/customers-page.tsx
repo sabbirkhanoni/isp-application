@@ -390,8 +390,8 @@ export function CustomersPage() {
                   <th className="px-4 py-3 whitespace-nowrap">{t.customers.package}</th>
                   <th className="px-4 py-3 whitespace-nowrap">{t.customers.expiryDate}</th>
                   <th className="px-4 py-3 whitespace-nowrap">{t.customers.status}</th>
+                  <th className="px-4 py-3 whitespace-nowrap">{t.leads.actions}</th>
                   <th className="px-4 py-3 whitespace-nowrap">{t.leads.area} & {t.leads.address}</th>
-                  <th className="px-4 py-3 text-right whitespace-nowrap">{t.leads.actions}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -464,17 +464,11 @@ export function CustomersPage() {
                         </div>
                       </td>
 
-                      {/* 5. Package Info */}
-                      <td className="px-4 py-3 align-top min-w-[140px]">
+                      {/* 5. Package Info (without price) */}
+                      <td className="px-4 py-3 align-top min-w-[130px]">
                         <div className="font-semibold text-slate-900">
                           {c.subscription?.packageName ?? '—'}
                         </div>
-                        {c.subscription && (
-                          <div className="text-xs text-emerald-700 font-semibold font-mono mt-0.5">
-                            {formatMoney(c.subscription.monthlyPricePoisha, language)}{' '}
-                            <span className="text-slate-400 font-normal font-sans">/ মাস</span>
-                          </div>
-                        )}
                         {c.subscription && (
                           <div className="text-[11px] text-slate-400 mt-0.5">
                             {t.enums.connectionType[c.subscription.connectionType]}
@@ -504,8 +498,19 @@ export function CustomersPage() {
                         )}
                       </td>
 
-                      {/* 8. Area & Address (at the end) */}
-                      <td className="px-4 py-3 align-top min-w-[190px]">
+                      {/* 8. Actions (without phone button) */}
+                      <td className="px-4 py-3 align-top whitespace-nowrap">
+                        <Link
+                          to={`/customers/${c.id}`}
+                          className="inline-flex items-center gap-1 rounded-md border border-line bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:border-brand hover:text-brand shadow-2xs transition"
+                        >
+                          <span>{t.customers.viewProfile}</span>
+                          <ArrowRight className="size-3" />
+                        </Link>
+                      </td>
+
+                      {/* 9. Area & Address (Very last column) */}
+                      <td className="px-4 py-3 align-top min-w-[200px]">
                         <div className="text-xs text-slate-700 flex items-start gap-1.5">
                           <MapPin className="size-3.5 text-slate-400 shrink-0 mt-0.5" />
                           <div>
@@ -514,26 +519,6 @@ export function CustomersPage() {
                             )}
                             <span className="text-slate-600">{c.address}</span>
                           </div>
-                        </div>
-                      </td>
-
-                      {/* 9. Actions */}
-                      <td className="px-4 py-3 text-right align-top whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <a
-                            href={`tel:${c.phone}`}
-                            title={c.phone}
-                            className="inline-flex size-7 items-center justify-center rounded-md border border-line bg-white text-slate-600 hover:border-brand hover:text-brand shadow-2xs transition"
-                          >
-                            <Phone className="size-3.5" />
-                          </a>
-                          <Link
-                            to={`/customers/${c.id}`}
-                            className="inline-flex items-center gap-1 rounded-md border border-line bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:border-brand hover:text-brand shadow-2xs transition"
-                          >
-                            <span>{t.customers.viewProfile}</span>
-                            <ArrowRight className="size-3" />
-                          </Link>
                         </div>
                       </td>
                     </tr>
@@ -621,7 +606,7 @@ export function CustomersPage() {
                       </div>
                     )}
 
-                    {/* Package & Bill */}
+                    {/* Package */}
                     <div className="flex items-center justify-between text-slate-600 pt-1 border-t border-slate-100">
                       <div className="flex items-center gap-1.5">
                         <Wifi className="size-3.5 text-slate-400 shrink-0" />
@@ -630,8 +615,8 @@ export function CustomersPage() {
                         </span>
                       </div>
                       {c.subscription && (
-                        <span className="font-mono font-semibold text-emerald-700">
-                          {formatMoney(c.subscription.monthlyPricePoisha, language)} / মাস
+                        <span className="text-slate-500 text-[11px]">
+                          {t.enums.connectionType[c.subscription.connectionType]}
                         </span>
                       )}
                     </div>
@@ -657,17 +642,10 @@ export function CustomersPage() {
                 </div>
 
                 {/* Card Footer Actions */}
-                <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between gap-2">
-                  <a
-                    href={`tel:${c.phone}`}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 h-8 rounded-lg border border-line bg-white text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-brand shadow-2xs transition"
-                  >
-                    <Phone className="size-3.5" />
-                    <span>{t.leads.phone}</span>
-                  </a>
+                <div className="mt-4 pt-3 border-t border-line/60">
                   <Link
                     to={`/customers/${c.id}`}
-                    className="flex-1 inline-flex items-center justify-center gap-1 h-8 rounded-lg bg-brand text-xs font-semibold text-white hover:bg-brand/90 shadow-2xs transition"
+                    className="w-full inline-flex items-center justify-center gap-1.5 h-8 rounded-lg bg-brand text-xs font-semibold text-white hover:bg-brand/90 shadow-2xs transition"
                   >
                     <span>{t.customers.viewProfile}</span>
                     <ArrowRight className="size-3.5" />
