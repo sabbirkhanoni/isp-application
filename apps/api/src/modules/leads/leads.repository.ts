@@ -37,7 +37,7 @@ export interface LeadRepository {
     input: ApproveLeadInput,
     now: Date,
   ): Promise<ApprovalResult>;
-  reject(leadId: string, reviewerId: string, reason: string, now: Date): Promise<LeadWithRelations>;
+  reject(leadId: string, reviewerId: string, reason: string | null, now: Date): Promise<LeadWithRelations>;
 }
 
 export class PrismaLeadRepository implements LeadRepository {
@@ -141,12 +141,12 @@ export class PrismaLeadRepository implements LeadRepository {
   async reject(
     leadId: string,
     reviewerId: string,
-    reason: string,
+    reason: string | null,
     now: Date,
   ): Promise<LeadWithRelations> {
     const claimed = await this.db.lead.updateMany({
       where: { id: leadId, status: 'PENDING' },
-      data: { status: 'REJECTED', reviewedBy: reviewerId, reviewedAt: now, rejectReason: reason },
+      data: { status: 'REJECTED', reviewedBy: reviewerId, reviewedAt: now, rejectReason: reason || null },
     });
     if (claimed.count === 0) {
       const exists = await this.db.lead.findUnique({ where: { id: leadId }, select: { id: true } });

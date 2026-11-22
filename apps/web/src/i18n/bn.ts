@@ -494,6 +494,7 @@ export const bn: Dictionary = {
     created: 'আবেদন জমা হয়েছে।',
     approve: 'অনুমোদন',
     reject: 'বাতিল করুন',
+    confirmReject: 'এই আবেদনটি কি বাতিল করতে চান?',
     rejectReason: 'বাতিলের কারণ',
     approveTitle: 'অনুমোদন ও সংযোগ ঠিক করুন',
     approved: 'অনুমোদিত হয়েছে। গ্রাহক তৈরি হয়েছে।',

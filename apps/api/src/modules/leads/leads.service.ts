@@ -76,7 +76,12 @@ export class LeadService {
     input: RejectLeadInput,
     ctx: RequestContext,
   ): Promise<LeadDto> {
-    const lead = await this.leads.reject(leadId, actor.userId, input.reason, this.clock.now());
+    const lead = await this.leads.reject(
+      leadId,
+      actor.userId,
+      input?.reason?.trim() || null,
+      this.clock.now(),
+    );
     await this.record(actor, AUDIT_ACTIONS.LEAD_REJECTED, leadId, ctx, {});
     return toLeadDto(lead);
   }

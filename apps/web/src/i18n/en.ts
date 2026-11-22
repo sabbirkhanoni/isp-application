@@ -499,6 +499,7 @@ export const en = {
     created: 'Request submitted.',
     approve: 'Approve',
     reject: 'Reject',
+    confirmReject: 'Are you sure you want to cancel this request?',
     rejectReason: 'Reason for rejecting',
     approveTitle: 'Approve and set up connection',
     approved: 'Approved. Customer created.',

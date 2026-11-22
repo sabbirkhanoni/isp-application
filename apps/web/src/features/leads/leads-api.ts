@@ -19,5 +19,5 @@ export async function fetchLeads(page: number, status: string) {
 export const createLead = (input: CreateLeadInput) => api.post<LeadDto>('/leads', input);
 export const approveLead = (id: string, input: ApproveLeadInput) =>
   api.post<{ lead: LeadDto; customer: CustomerDto }>(`/leads/${id}/approve`, input);
-export const rejectLead = (id: string, reason: string) =>
+export const rejectLead = (id: string, reason?: string) =>
   api.post<LeadDto>(`/leads/${id}/reject`, { reason });

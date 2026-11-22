@@ -1,11 +1,11 @@
 import { LEAD_STATUSES, type LeadDto } from '@isp/contracts';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Pager } from '@/components/ui/pager';
 import { Loading } from '@/components/ui/page';
 import { Select } from '@/components/ui/select';
@@ -30,7 +30,6 @@ export function LeadsPage() {
   const [showForm, setShowForm] = useState(false);
   const [approving, setApproving] = useState<LeadDto | null>(null);
   const [rejecting, setRejecting] = useState<LeadDto | null>(null);
-  const [reason, setReason] = useState('');
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,7 +47,7 @@ export function LeadsPage() {
       Promise.all([refresh(), queryClient.invalidateQueries({ queryKey: customersKey })]),
   });
   const reject = useMutation({
-    mutationFn: ({ id, why }: { id: string; why: string }) => rejectLead(id, why),
+    mutationFn: ({ id }: { id: string }) => rejectLead(id),
     onSuccess: refresh,
   });
   const canReview = can('LEAD_APPROVE');
@@ -57,9 +56,8 @@ export function LeadsPage() {
     if (!rejecting) return;
     setError(null);
     try {
-      await reject.mutateAsync({ id: rejecting.id, why: reason.trim() });
+      await reject.mutateAsync({ id: rejecting.id });
       setRejecting(null);
-      setReason('');
       setNotice(t.leads.rejected);
     } catch (e) {
       setError(toMessage(e));
@@ -107,24 +105,49 @@ export function LeadsPage() {
       )}
 
       {rejecting && (
-        <Card className="space-y-3 border-red-300">
-          <label htmlFor="reject-reason" className="text-sm font-medium">
-            {t.leads.rejectReason}: {rejecting.fullName}
-          </label>
-          <Input id="reject-reason" value={reason} onChange={(e) => setReason(e.target.value)} />
-          <div className="flex gap-2">
-            <Button
-              variant="danger"
-              disabled={reason.trim().length < 3}
-              onClick={() => void doReject()}
-            >
-              {t.leads.reject}
-            </Button>
-            <Button variant="outline" onClick={() => setRejecting(null)}>
-              {t.common.cancel}
-            </Button>
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        >
+          <div
+            className="fixed inset-0 bg-ink/60 backdrop-blur-[2px] transition-opacity"
+            onClick={() => setRejecting(null)}
+          />
+          <div className="relative z-10 w-full max-w-md rounded-2xl bg-white p-6 shadow-xl space-y-4">
+            <div className="flex items-start gap-3">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-red-100 text-red-600">
+                <AlertTriangle className="size-5" aria-hidden="true" />
+              </span>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-slate-900">{t.leads.confirmReject}</h3>
+                <p className="mt-1 text-sm text-slate-600">
+                  <b>{rejecting.fullName}</b> ({rejecting.phone}){' '}
+                  {language === 'bn'
+                    ? 'এর নতুন সংযোগের আবেদনটি কি বাতিল করতে চান?'
+                    : `'s new connection request will be cancelled.`}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2 border-t border-line">
+              <Button
+                variant="outline"
+                onClick={() => setRejecting(null)}
+                disabled={reject.isPending}
+              >
+                {t.common.cancel}
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => void doReject()}
+                disabled={reject.isPending}
+              >
+                {reject.isPending ? t.common.loading : t.leads.reject}
+              </Button>
+            </div>
           </div>
-        </Card>
+        </div>
       )}
 
       <Select
