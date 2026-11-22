@@ -13,6 +13,7 @@ async function main() {
   console.log('Seeding comprehensive demo data for client presentation...');
 
   // Clean previous demo transactions for idempotency
+  await db.lineStatus.deleteMany().catch(() => {});
   await db.paymentAllocation.deleteMany().catch(() => {});
   await db.bkashTransaction.deleteMany().catch(() => {});
   await db.bkashImportBatch.deleteMany().catch(() => {});
@@ -673,8 +674,8 @@ async function main() {
       });
     }
 
-    // Line Status
-    if (c.router && c.pppoe) {
+    // Line Status (Only provisioned lines for ACTIVE and SUSPENDED customers)
+    if (c.router && c.pppoe && c.status !== 'PENDING_ACTIVATION' && c.status !== 'TERMINATED') {
       await db.lineStatus.upsert({
         where: { routerId_pppoeUsername: { routerId: c.router, pppoeUsername: c.pppoe } },
         update: {

@@ -321,7 +321,7 @@ export class NetworkRepository {
     JOIN customers c ON c.id = s.customer_id
     JOIN routers r ON r.id = s.router_id
     LEFT JOIN line_status ls ON ls.router_id = s.router_id AND ls.pppoe_username = s.pppoe_username
-    WHERE s.pppoe_username IS NOT NULL AND c.status <> 'TERMINATED'`;
+    WHERE s.pppoe_username IS NOT NULL AND c.status IN ('ACTIVE', 'SUSPENDED')`;
 
   private static readonly STATE = Prisma.sql`
     (CASE WHEN ls.router_id IS NULL THEN 'NEVER_SEEN' WHEN ls.online THEN 'ONLINE' ELSE 'OFFLINE' END)`;
