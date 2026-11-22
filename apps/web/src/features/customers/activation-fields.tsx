@@ -71,7 +71,7 @@ export function ActivationFields({ compactHints = false }: ActivationFieldsProps
         >
           <Input
             id="act-pppoe"
-            placeholder={compactHints ? 'যেমন: user123' : undefined}
+            placeholder={compactHints ? 'যেমন: user01' : undefined}
             autoCapitalize="none"
             autoComplete="off"
             {...register('pppoeUsername')}
@@ -87,7 +87,7 @@ export function ActivationFields({ compactHints = false }: ActivationFieldsProps
         >
           <Input
             id="act-pppoe-pw"
-            placeholder={compactHints ? 'ঐচ্ছিক (পাসওয়ার্ড)' : undefined}
+            placeholder={compactHints ? 'ঐচ্ছিক (পাসওয়ার্ড দিন)' : undefined}
             autoCapitalize="none"
             autoComplete="off"
             {...register('pppoePassword')}
@@ -130,7 +130,7 @@ export function ActivationFields({ compactHints = false }: ActivationFieldsProps
         >
           <Input
             id="act-code"
-            placeholder={compactHints ? 'ঐচ্ছিক (নতুন হলে ফাঁকা রাখুন)' : undefined}
+            placeholder={compactHints ? 'ঐচ্ছিক (ফাঁকা রাখলে অটো আইডি তৈরি হবে)' : undefined}
             autoCapitalize="none"
             autoComplete="off"
             {...register('customerCode')}

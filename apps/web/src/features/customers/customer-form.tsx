@@ -72,12 +72,12 @@ export function CustomerForm({ onSubmit, onCancel, className }: CustomerFormProp
                 </div>
 
                 <Field label={t.leads.fullName} htmlFor="c-name" error={errors.fullName && invalid}>
-                  <Input id="c-name" placeholder="যেমন: মো: রহিম উদ্দিন" {...register('fullName')} />
+                  <Input id="c-name" placeholder="যেমন: মোঃ রহিম উদ্দিন" {...register('fullName')} />
                 </Field>
 
                 <div className="grid grid-cols-2 gap-2">
                   <Field label={t.leads.phone} htmlFor="c-phone" error={errors.phone && invalid}>
-                    <Input id="c-phone" inputMode="tel" placeholder="01XXXXXXXXX" {...register('phone')} />
+                    <Input id="c-phone" inputMode="tel" placeholder="০১XXXXXXXXX" {...register('phone')} />
                   </Field>
                   <Field label={t.customers.altPhone} htmlFor="c-alt" error={errors.altPhone && invalid}>
                     <Input id="c-alt" inputMode="tel" placeholder="বিকল্প মোবাইল" {...register('altPhone')} />
@@ -85,11 +85,11 @@ export function CustomerForm({ onSubmit, onCancel, className }: CustomerFormProp
                 </div>
 
                 <Field label={t.leads.area} htmlFor="c-area">
-                  <Input id="c-area" placeholder="যেমন: সেক্টর-৩, উত্তরা" {...register('area')} />
+                  <Input id="c-area" placeholder="যেমন: মিরপুর-১০, ঢাকা" {...register('area')} />
                 </Field>
 
                 <Field label={t.leads.address} htmlFor="c-address" error={errors.address && invalid}>
-                  <Input id="c-address" placeholder="বাসা/হোল্ডিং, রোড বিস্তারিত" {...register('address')} />
+                  <Input id="c-address" placeholder="বাসা/হোল্ডিং নম্বর, ফ্ল্যাট, রোড" {...register('address')} />
                 </Field>
               </div>
             </div>
@@ -131,18 +131,18 @@ export function CustomerForm({ onSubmit, onCancel, className }: CustomerFormProp
                 </div>
 
                 <Field label={t.fiber.oltName} htmlFor="c-olt">
-                  <Input id="c-olt" placeholder="ঐচ্ছিক (যেমন OLT-01)" {...register('oltName')} />
+                  <Input id="c-olt" placeholder="যেমন: Core-OLT-1" {...register('oltName')} />
                 </Field>
 
                 <Field label={t.fiber.ponPort} htmlFor="c-pon">
-                  <Input id="c-pon" placeholder="ঐচ্ছিক (যেমন 1/1/2)" {...register('ponPort')} />
+                  <Input id="c-pon" placeholder="যেমন: PON 1" {...register('ponPort')} />
                 </Field>
 
                 <Field label={t.fiber.onuSerial} htmlFor="c-onu">
-                  <Input id="c-onu" autoCapitalize="characters" placeholder="ঐচ্ছিক (যেমন HWTC1234)" {...register('onuSerial')} />
+                  <Input id="c-onu" autoCapitalize="characters" placeholder="যেমন: ZTEG12345678" {...register('onuSerial')} />
                 </Field>
 
-                <div className="rounded-lg bg-white/90 border border-slate-200/80 p-2.5 text-[11px] text-slate-500 leading-relaxed">
+                <div className="rounded-lg bg-amber-50/80 border border-amber-200/80 p-2.5 text-[11px] text-amber-900 leading-relaxed">
                   💡 {t.fiber.hint}
                 </div>
               </div>
@@ -160,7 +160,7 @@ export function CustomerForm({ onSubmit, onCancel, className }: CustomerFormProp
               className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 shadow-sm gap-1.5"
             >
               <Check className="size-4" />
-              {isSubmitting ? t.common.loading : t.common.save}
+              {isSubmitting ? t.common.loading : 'গ্রাহক সংরক্ষণ করুন'}
             </Button>
           </div>
         </form>
