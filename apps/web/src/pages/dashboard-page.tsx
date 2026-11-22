@@ -289,114 +289,119 @@ function AdminDashboard() {
             />
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-3">
-            <Card className="space-y-4 lg:col-span-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <h2 className="font-semibold">{t.dashboard.customers}</h2>
-                  <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700">
-                    {t.dashboard.totalCustomers}: {totalCustomers}
-                  </span>
-                </div>
-                <Link to="/customers" className="text-xs font-medium text-brand hover:underline">
-                  {t.customers.title} →
-                </Link>
+          <Card className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <h2 className="font-semibold">{t.dashboard.customers}</h2>
+                <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700">
+                  {t.dashboard.totalCustomers}: {totalCustomers}
+                </span>
               </div>
-              <div
-                className={cn(
-                  'grid grid-cols-2 gap-3',
-                  data.customers.terminated > 0 ? 'sm:grid-cols-3 lg:grid-cols-5' : 'sm:grid-cols-4',
-                )}
+              <Link to="/customers" className="text-xs font-medium text-brand hover:underline">
+                {t.customers.title} →
+              </Link>
+            </div>
+            <div
+              className={cn(
+                'grid grid-cols-2 gap-3',
+                data.customers.terminated > 0 ? 'sm:grid-cols-3 lg:grid-cols-5' : 'sm:grid-cols-4',
+              )}
+            >
+              <Link
+                to="/customers"
+                className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
               >
+                <Users className="size-5 text-brand" aria-hidden="true" />
+                <p className="mt-2 text-2xl font-bold text-slate-900">{totalCustomers}</p>
+                <p className="text-xs text-slate-500">{t.dashboard.totalCustomers}</p>
+              </Link>
+              <Link
+                to="/customers"
+                className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
+              >
+                <UserCheck className="size-5 text-emerald-600" aria-hidden="true" />
+                <p className="mt-2 text-2xl font-bold text-slate-900">{data.customers.active}</p>
+                <p className="text-xs text-slate-500">{t.dashboard.activeCustomers}</p>
+              </Link>
+              <Link
+                to="/customers"
+                className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
+              >
+                <UserPlus className="size-5 text-amber-600" aria-hidden="true" />
+                <p className="mt-2 text-2xl font-bold text-slate-900">{data.customers.pendingActivation}</p>
+                <p className="text-xs text-slate-500">{t.dashboard.pendingCustomers}</p>
+              </Link>
+              <Link
+                to="/customers"
+                className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
+              >
+                <PauseCircle className="size-5 text-red-600" aria-hidden="true" />
+                <p className="mt-2 text-2xl font-bold text-slate-900">{data.customers.suspended}</p>
+                <p className="text-xs text-slate-500">{t.dashboard.suspendedCustomers}</p>
+              </Link>
+              {data.customers.terminated > 0 && (
                 <Link
                   to="/customers"
                   className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
                 >
-                  <Users className="size-5 text-brand" aria-hidden="true" />
-                  <p className="mt-2 text-2xl font-bold text-slate-900">{totalCustomers}</p>
-                  <p className="text-xs text-slate-500">{t.dashboard.totalCustomers}</p>
-                </Link>
-                <Link
-                  to="/customers"
-                  className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
-                >
-                  <UserCheck className="size-5 text-emerald-600" aria-hidden="true" />
-                  <p className="mt-2 text-2xl font-bold text-slate-900">{data.customers.active}</p>
-                  <p className="text-xs text-slate-500">{t.dashboard.activeCustomers}</p>
-                </Link>
-                <Link
-                  to="/customers"
-                  className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
-                >
-                  <UserPlus className="size-5 text-amber-600" aria-hidden="true" />
-                  <p className="mt-2 text-2xl font-bold text-slate-900">{data.customers.pendingActivation}</p>
-                  <p className="text-xs text-slate-500">{t.dashboard.pendingCustomers}</p>
-                </Link>
-                <Link
-                  to="/customers"
-                  className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
-                >
-                  <PauseCircle className="size-5 text-red-600" aria-hidden="true" />
-                  <p className="mt-2 text-2xl font-bold text-slate-900">{data.customers.suspended}</p>
-                  <p className="text-xs text-slate-500">{t.dashboard.suspendedCustomers}</p>
-                </Link>
-                {data.customers.terminated > 0 && (
-                  <Link
-                    to="/customers"
-                    className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
-                  >
-                    <UserX className="size-5 text-slate-400" aria-hidden="true" />
-                    <p className="mt-2 text-2xl font-bold text-slate-600">
-                      {data.customers.terminated}
-                    </p>
-                    <p className="text-xs text-slate-500">{t.dashboard.terminatedCustomers}</p>
-                  </Link>
-                )}
-              </div>
-              {lineSummary && lineSummary.managed > 0 && (
-                <div className="space-y-2 border-t border-line pt-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-2 font-semibold">
-                      <Radio className="size-4 text-brand" aria-hidden="true" />
-                      {t.dashboard.linesTitle}
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">
-                        {lineSummary.online} / {lineSummary.managed} {t.lines.online} ({onlinePct}%)
-                      </span>
-                    </span>
-                    <Link to="/network/lines" className="text-brand hover:underline">
-                      {t.dashboard.linesOpen}
-                    </Link>
-                  </div>
-                  <div className="flex h-2.5 overflow-hidden rounded-full bg-slate-100">
-                    <div className="bg-emerald-500" style={{ width: `${onlinePct}%` }} />
-                  </div>
-                  <p className="text-sm text-slate-600">
-                    <b className="text-emerald-600">{lineSummary.online}</b> {t.lines.online} ·{' '}
-                    <b className="text-slate-700">{lineSummary.offline}</b> {t.lines.offline}
-                    <span className="ml-1 text-xs text-slate-500">
-                      ({t.dashboard.totalLines}: {lineSummary.managed})
-                    </span>
+                  <UserX className="size-5 text-slate-400" aria-hidden="true" />
+                  <p className="mt-2 text-2xl font-bold text-slate-600">
+                    {data.customers.terminated}
                   </p>
-                </div>
+                  <p className="text-xs text-slate-500">{t.dashboard.terminatedCustomers}</p>
+                </Link>
               )}
-            </Card>
+            </div>
+            {lineSummary && lineSummary.managed > 0 && (
+              <div className="space-y-2 border-t border-line pt-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-2 font-semibold">
+                    <Radio className="size-4 text-brand" aria-hidden="true" />
+                    {t.dashboard.linesTitle}
+                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">
+                      {lineSummary.online} / {lineSummary.managed} {t.lines.online} ({onlinePct}%)
+                    </span>
+                  </span>
+                  <Link to="/network/lines" className="text-brand hover:underline">
+                    {t.dashboard.linesOpen}
+                  </Link>
+                </div>
+                <div className="flex h-2.5 overflow-hidden rounded-full bg-slate-100">
+                  <div className="bg-emerald-500" style={{ width: `${onlinePct}%` }} />
+                </div>
+                <p className="text-sm text-slate-600">
+                  <b className="text-emerald-600">{lineSummary.online}</b> {t.lines.online} ·{' '}
+                  <b className="text-slate-700">{lineSummary.offline}</b> {t.lines.offline}
+                  <span className="ml-1 text-xs text-slate-500">
+                    ({t.dashboard.totalLines}: {lineSummary.managed})
+                  </span>
+                </p>
+              </div>
+            )}
+          </Card>
 
-            <Card className="space-y-3">
+          <Card className="space-y-3">
+            <div className="flex items-center justify-between">
               <h2 className="font-semibold">{t.dashboard.attention}</h2>
-              {attention.length === 0 ? (
-                <div className="flex flex-col items-center gap-2 py-6 text-center">
-                  <CheckCircle2 className="size-8 text-emerald-500" aria-hidden="true" />
-                  <p className="text-sm text-slate-500">{t.dashboard.allClear}</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {attention.map((item) => (
-                    <AttentionItem key={item.to} {...item} />
-                  ))}
-                </div>
+              {attention.length > 0 && (
+                <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
+                  {attention.length} {t.dashboard.attention}
+                </span>
               )}
-            </Card>
-          </div>
+            </div>
+            {attention.length === 0 ? (
+              <div className="flex items-center gap-2 py-2 text-slate-500">
+                <CheckCircle2 className="size-5 text-emerald-500" aria-hidden="true" />
+                <p className="text-sm">{t.dashboard.allClear}</p>
+              </div>
+            ) : (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {attention.map((item) => (
+                  <AttentionItem key={item.to} {...item} />
+                ))}
+              </div>
+            )}
+          </Card>
 
           <TrendChart />
 
