@@ -155,18 +155,32 @@ function AttentionItem({
   return (
     <Link
       to={to}
-      className="flex items-center gap-3 rounded-xl border border-line px-3 py-2.5 transition hover:bg-slate-50"
+      className={cn(
+        'group flex items-center justify-between gap-3 rounded-xl border border-line bg-white p-3.5 transition hover:bg-slate-50 hover:border-slate-300',
+        tone === 'bad' ? 'hover:border-red-200' : 'hover:border-amber-200',
+      )}
     >
+      <div className="flex min-w-0 items-center gap-3">
+        <span
+          className={cn(
+            'flex size-10 shrink-0 items-center justify-center rounded-lg transition-transform group-hover:scale-105',
+            tone === 'bad' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600',
+          )}
+        >
+          <Icon className="size-5" aria-hidden="true" />
+        </span>
+        <span className="min-w-0 text-sm font-medium text-slate-800 leading-snug">
+          {label}
+        </span>
+      </div>
       <span
         className={cn(
-          'flex size-9 items-center justify-center rounded-lg',
-          tone === 'bad' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600',
+          'flex shrink-0 items-center justify-center rounded-full px-2.5 py-0.5 text-sm font-bold',
+          tone === 'bad' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-700',
         )}
       >
-        <Icon className="size-4" aria-hidden="true" />
+        {count}
       </span>
-      <span className="flex-1 text-sm font-medium">{label}</span>
-      <span className="text-lg font-bold">{count}</span>
     </Link>
   );
 }
@@ -454,7 +468,14 @@ function AdminDashboard() {
                 <p className="text-sm">{t.dashboard.allClear}</p>
               </div>
             ) : (
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <div
+                className={cn(
+                  'grid gap-3 grid-cols-1',
+                  attention.length === 2 && 'sm:grid-cols-2',
+                  attention.length === 3 && 'sm:grid-cols-2 lg:grid-cols-3',
+                  attention.length >= 4 && 'sm:grid-cols-2 lg:grid-cols-4',
+                )}
+              >
                 {attention.map((item) => (
                   <AttentionItem key={item.to} {...item} />
                 ))}
