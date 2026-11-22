@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spike S4 — cookie login</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 16px;
+        max-width: 480px;
+      }
+      button {
+        font-size: 16px;
+        padding: 12px 16px;
+        margin: 4px 4px 4px 0;
+      }
+      pre {
+        background: #f4f4f4;
+        padding: 12px;
+        overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Spike S4</h1>
+    <p>Login, then reload the page and press "Who am I". It should stay logged in.</p>
+    <button data-call="POST /api/login">Login</button>
+    <button data-call="GET /api/me">Who am I</button>
+    <button data-call="POST /api/logout">Logout</button>
+    <pre id="out">ready</pre>
+    <script>
+      const out = document.getElementById('out');
+      document.querySelectorAll('button').forEach((b) =>
+        b.addEventListener('click', async () => {
+          const [method, path] = b.dataset.call.split(' ');
+          const started = performance.now();
+          try {
+            const res = await fetch(path, { method, credentials: 'same-origin' });
+            out.textContent =
+              `${res.status} (${Math.round(performance.now() - started)} ms)\n` +
+              (await res.text());
+          } catch (e) {
+            out.textContent = 'ERROR ' + e.message;
+          }
+        }),
+      );
+    </script>
+  </body>
+</html>

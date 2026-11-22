@@ -1,0 +1,46 @@
+services:
+  - type: web
+    name: isp-api
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: npm ci && npm run build:contracts && npm run build -w @isp/api
+    # Pre-deploy commands need a paid Render plan, so migrations run right before the server starts
+    # (safe: the runner takes a database lock and applies each migration once).
+    startCommand: npm run db:migrate:deploy -w @isp/api && npm run start -w @isp/api
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: NODE_ENV
+        value: production
+      - key: COOKIE_SECURE
+        value: 'true'
+      - key: SESSION_COOKIE_NAME
+        value: __Host-sid
+      - key: TRUST_PROXY_HOPS
+        value: 1
+      - key: BACKGROUND_JOBS
+        value: 'true'
+      - key: OWNER_PHONE
+        sync: false # optional: your mobile number for the monthly summary SMS
+      - key: SMS_DRIVER
+        value: log # switch to http (+ SMS_API_URL, SMS_API_KEY) when the SMS provider is chosen
+      - key: SMS_MONTHLY_CAP
+        value: 3000
+      - key: ROUTER_SECRET
+        generateValue: true # encrypts router passwords in the database; never change it after saving routers
+      - key: ROUTER_DRY_RUN
+        value: true # true = router changes are only logged. Set to false when you are ready to go live.
+      - key: AUTO_SUSPEND
+        value: false # true = overdue customers are suspended automatically after the grace days
+      - key: AUTO_SUSPEND_GRACE_DAYS
+        value: 3
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: PROXY_SECRET
+        sync: false # the same random text you put in Cloudflare Pages; lets the API trust the visitor IP

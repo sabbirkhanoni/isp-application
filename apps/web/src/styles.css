@@ -1,0 +1,134 @@
+@import '@fontsource-variable/plus-jakarta-sans/wght.css';
+@import '@fontsource-variable/noto-sans-bengali/wght.css';
+@import 'tailwindcss';
+
+/*
+  Design tokens. Calm "network operations" look: a deep ink sidebar, a cool light canvas,
+  one teal brand colour, and amber reserved for things that need attention.
+*/
+@theme {
+  --color-brand: #0d8a82;
+  --color-brand-dark: #0a6c66;
+  --color-brand-soft: #e3f5f3;
+  --color-ink: #0c1b24;
+  --color-ink-2: #14293a;
+  --color-canvas: #f2f5f8;
+  --color-line: #e2e8ee;
+  --color-surface: #ffffff;
+  --color-signal: #f5a524;
+  --font-sans:
+    'Plus Jakarta Sans Variable', 'Noto Sans Bengali Variable', system-ui, -apple-system,
+    'Segoe UI', sans-serif;
+  --shadow-card: 0 1px 2px rgb(12 27 36 / 0.05), 0 4px 14px -6px rgb(12 27 36 / 0.1);
+  --shadow-pop: 0 10px 30px -10px rgb(12 27 36 / 0.25);
+}
+
+/*
+  Dark mode re-maps the same tokens, so every screen follows without per-component dark: classes.
+  Slate runs light-to-dark in the light theme; here the scale is flipped.
+*/
+[data-theme='dark'] {
+  color-scheme: dark;
+  --color-canvas: #08121a;
+  --color-surface: #101f2b;
+  --color-line: #22384a;
+  --color-ink: #050d14;
+  --color-brand: #19a79d;
+  --color-brand-dark: #14958c;
+  --color-brand-soft: #0f3a3b;
+  --color-slate-50: #0d1a24;
+  --color-slate-100: #152635;
+  --color-slate-200: #223648;
+  --color-slate-300: #31485c;
+  --color-slate-400: #6c8498;
+  --color-slate-500: #8ea3b4;
+  --color-slate-600: #aebdca;
+  --color-slate-700: #c9d5de;
+  --color-slate-800: #e0e8ee;
+  --color-slate-900: #f1f5f8;
+  --color-slate-950: #f8fafb;
+  --color-red-50: #3a1519;
+  --color-red-100: #4a1a1f;
+  --color-red-600: #f26b6b;
+  --color-red-700: #ff8a8a;
+  --color-amber-50: #3b2a0c;
+  --color-amber-100: #4a3510;
+  --color-amber-600: #f5b94c;
+  --color-amber-800: #fbcf7b;
+  --color-emerald-50: #0e3326;
+  --color-emerald-100: #12412f;
+  --color-emerald-600: #34c38f;
+  --color-emerald-700: #5bd8a9;
+  --color-emerald-800: #7de3bd;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 18px -8px rgb(0 0 0 / 0.5);
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-canvas text-slate-800 antialiased;
+    font-feature-settings: 'tnum' 1;
+    line-height: 1.55; /* Bangla letters need more air than Latin */
+  }
+  h1 {
+    @apply tracking-tight text-slate-900;
+  }
+  h2 {
+    @apply text-slate-900;
+  }
+  ::selection {
+    background: var(--color-brand-soft);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  /* Every data table in the app gets the same quiet, readable treatment. */
+  table {
+    @apply border-separate border-spacing-0;
+  }
+  thead th {
+    @apply sticky top-0 whitespace-nowrap border-b border-line bg-slate-50/90 px-3 py-2.5 text-xs font-semibold text-slate-500 backdrop-blur;
+  }
+  tbody td {
+    @apply border-b border-slate-100 px-3 py-2.5;
+  }
+  tbody tr:last-child td {
+    @apply border-b-0;
+  }
+  tbody tr {
+    @apply transition-colors;
+  }
+  tbody tr:hover td {
+    @apply bg-slate-50/70;
+  }
+  /* Existing screens use p-3 on cells; keep their spacing but fix the borders they added. */
+  tr.border-t {
+    border-top-width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Slide-over menu on small screens: a reveal that answers the tap. */
+@keyframes drawer-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: none;
+  }
+}
+.drawer-in {
+  animation: drawer-in 180ms ease-out;
+}

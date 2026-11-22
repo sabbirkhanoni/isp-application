@@ -1,0 +1,707 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  STAFF
+
+  @@map("role")
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+
+  @@map("user_status")
+}
+
+enum Language {
+  bn
+  en
+
+  @@map("language")
+}
+
+enum AuditOutcome {
+  SUCCESS
+  FAILURE
+  DENIED
+
+  @@map("audit_outcome")
+}
+
+model User {
+  id                 String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username           String     @unique
+  fullName           String     @map("full_name")
+  phone              String?
+  passwordHash       String     @map("password_hash")
+  role               Role
+  status             UserStatus @default(ACTIVE)
+  language           Language   @default(bn)
+  mustChangePassword Boolean    @default(false) @map("must_change_password")
+  chargesCreated Charge[]       @relation("ChargeCreatedBy")
+  extraPermissions   String[]   @default([]) @map("extra_permissions")
+  failedLoginCount   Int        @default(0) @map("failed_login_count")
+  lockedUntil        DateTime?  @map("locked_until") @db.Timestamptz(6)
+  lastLoginAt        DateTime?  @map("last_login_at") @db.Timestamptz(6)
+  createdAt          DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  sessions  Session[]
+  auditLogs AuditLog[]
+  createdCustomers Customer[]
+  assignedCustomers Customer[] @relation("CustomerCollector")
+  collectionTargets CollectionTarget[]
+  leadsCreated     Lead[] @relation("LeadCreatedBy")
+  leadsReviewed    Lead[] @relation("LeadReviewedBy")
+  expenses         Expense[]
+  paymentsReceived Payment[] @relation("PaymentReceivedBy")
+  paymentsReversed Payment[] @relation("PaymentReversedBy")
+  bkashBatches     BkashImportBatch[]
+  bkashResolved    BkashTransaction[] @relation("BkashResolvedBy")
+
+  @@map("users")
+}
+
+model Session {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tokenHash  String    @unique @map("token_hash")
+  userId     String    @map("user_id") @db.Uuid
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  expiresAt  DateTime  @map("expires_at") @db.Timestamptz(6)
+  lastSeenAt DateTime  @default(now()) @map("last_seen_at") @db.Timestamptz(6)
+  revokedAt  DateTime? @map("revoked_at") @db.Timestamptz(6)
+  ipAddress  String?   @map("ip_address")
+  userAgent  String?   @map("user_agent")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model AuditLog {
+  id          String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  actorUserId String?      @map("actor_user_id") @db.Uuid
+  action      String
+  targetType  String?      @map("target_type")
+  targetId    String?      @map("target_id")
+  outcome     AuditOutcome
+  requestId   String?      @map("request_id")
+  ipAddress   String?      @map("ip_address")
+  metadata    Json?
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  actor User? @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([actorUserId, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_logs")
+}
+
+model SystemSetting {
+  key       String   @id
+  valueJson Json     @map("value_json")
+  updatedBy String?  @map("updated_by") @db.Uuid
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("system_settings")
+}
+
+enum ConnectionType {
+  PPPOE
+  DHCP
+  STATIC
+  HOTSPOT
+
+  @@map("connection_type")
+}
+
+enum ActivationPolicy {
+  ACTIVATE_NOW
+  AFTER_FIRST_PAYMENT
+  MANUAL
+
+  @@map("activation_policy")
+}
+
+enum CustomerStatus {
+  PENDING_ACTIVATION
+  ACTIVE
+  SUSPENDED
+  TERMINATED
+
+  @@map("customer_status")
+}
+
+enum RouterDriver {
+  REST
+  AGENT
+
+  @@map("router_driver")
+}
+
+enum NetworkJobStatus {
+  PENDING
+  RUNNING
+  DONE
+  FAILED
+
+  @@map("network_job_status")
+}
+
+enum SuspendReason {
+  NON_PAYMENT
+  MANUAL
+
+  @@map("suspend_reason")
+}
+
+enum LeadStatus {
+  PENDING
+  APPROVED
+  REJECTED
+
+  @@map("lead_status")
+}
+
+model Package {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String   @unique
+  speedMbps         Int      @map("speed_mbps")
+  monthlyPricePoisha BigInt  @map("monthly_price_poisha")
+  pppProfile        String?  @map("ppp_profile")
+  isActive          Boolean  @default(true) @map("is_active")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  subscriptions Subscription[]
+  leads         Lead[]
+
+  @@map("packages")
+}
+
+// customer_code is unique case-insensitively through a SQL index on lower(customer_code) (see migration 0002).
+model Customer {
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customerCode String         @map("customer_code")
+  fullName     String         @map("full_name")
+  phone        String
+  altPhone     String?        @map("alt_phone")
+  address      String
+  area         String?
+  note         String?
+  creditPoisha BigInt         @default(0) @map("credit_poisha")
+  smsOptOut    Boolean        @default(false) @map("sms_opt_out")
+  collectorId  String?        @map("collector_id") @db.Uuid
+  isFree       Boolean        @default(false) @map("is_free")
+  joinedOn     DateTime?      @map("joined_on") @db.Date
+  status       CustomerStatus @default(PENDING_ACTIVATION)
+  suspendReason SuspendReason? @map("suspend_reason")
+  suspendedAt  DateTime?      @map("suspended_at") @db.Timestamptz(6)
+  terminatedAt DateTime?      @map("terminated_at") @db.Timestamptz(6)
+  createdBy    String?        @map("created_by") @db.Uuid
+  createdAt    DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  creator      User?         @relation(fields: [createdBy], references: [id])
+  collector    User?         @relation("CustomerCollector", fields: [collectorId], references: [id])
+  subscription Subscription?
+  lead         Lead?
+  invoices     Invoice[]
+  payments     Payment[]
+  smsMessages  SmsMessage[]
+  bkashTransactions BkashTransaction[] @relation("BkashCustomer")
+  bkashSuggestions  BkashTransaction[] @relation("BkashSuggested")
+  networkJobs  NetworkJob[]
+  charges      Charge[]
+  movedPayments Payment[]     @relation("PaymentMovedFrom")
+
+  @@index([phone])
+  @@index([status])
+  @@map("customers")
+}
+
+model Subscription {
+  id               String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customerId       String           @unique @map("customer_id") @db.Uuid
+  packageId        String           @map("package_id") @db.Uuid
+  connectionType   ConnectionType   @map("connection_type")
+  pppoeUsername    String?          @map("pppoe_username")
+  routerId         String?          @map("router_id") @db.Uuid
+  pppoePasswordEnc String?          @map("pppoe_password_enc")
+  pppoePasswordVerified Boolean     @default(false) @map("pppoe_password_verified")
+  oltName          String?          @map("olt_name")
+  ponPort          String?          @map("pon_port")
+  onuSerial        String?          @map("onu_serial")
+  monthlyDiscountPoisha BigInt      @default(0) @map("monthly_discount_poisha")
+  discountNote     String?          @map("discount_note")
+  activationPolicy ActivationPolicy @map("activation_policy")
+  createdAt        DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  customer Customer @relation(fields: [customerId], references: [id])
+  package  Package  @relation(fields: [packageId], references: [id])
+  router   Router?  @relation(fields: [routerId], references: [id], onDelete: SetNull)
+
+  @@index([packageId])
+  @@index([routerId])
+  @@map("subscriptions")
+}
+
+model Lead {
+  id                 String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fullName           String         @map("full_name")
+  phone              String
+  address            String
+  area               String?
+  requestedPackageId String?        @map("requested_package_id") @db.Uuid
+  connectionType     ConnectionType @default(PPPOE) @map("connection_type")
+  note               String?
+  status             LeadStatus     @default(PENDING)
+  rejectReason       String?        @map("reject_reason")
+  createdBy          String         @map("created_by") @db.Uuid
+  reviewedBy         String?        @map("reviewed_by") @db.Uuid
+  reviewedAt         DateTime?      @map("reviewed_at") @db.Timestamptz(6)
+  customerId         String?        @unique @map("customer_id") @db.Uuid
+  createdAt          DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  requestedPackage Package?  @relation(fields: [requestedPackageId], references: [id])
+  creator          User      @relation("LeadCreatedBy", fields: [createdBy], references: [id])
+  reviewer         User?     @relation("LeadReviewedBy", fields: [reviewedBy], references: [id])
+  customer         Customer? @relation(fields: [customerId], references: [id])
+
+  @@index([status, createdAt])
+  @@index([createdBy])
+  @@map("leads")
+}
+
+enum InvoiceStatus {
+  ISSUED
+  PARTIALLY_PAID
+  PAID
+  VOID
+
+  @@map("invoice_status")
+}
+
+enum PaymentMethod {
+  CASH
+  BKASH
+
+  @@map("payment_method")
+}
+
+enum PaymentStatus {
+  POSTED
+  REVERSED
+
+  @@map("payment_status")
+}
+
+enum SmsType {
+  REMINDER_D2
+  REMINDER_D1
+  PAYMENT_RECEIVED
+  BULK
+
+  @@map("sms_type")
+}
+
+enum SmsStatus {
+  PENDING
+  SENT
+  FAILED
+  CANCELLED
+
+  @@map("sms_status")
+}
+
+model Invoice {
+  id                  String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  invoiceNumber       String        @unique @map("invoice_number")
+  customerId          String        @map("customer_id") @db.Uuid
+  period              DateTime      @db.Date
+  amountPoisha        BigInt        @map("amount_poisha")
+  paidPoisha          BigInt        @default(0) @map("paid_poisha")
+  creditAppliedPoisha BigInt        @default(0) @map("credit_applied_poisha")
+  dueDate             DateTime      @map("due_date") @db.Date
+  status              InvoiceStatus @default(ISSUED)
+  issuedAt            DateTime      @map("issued_at") @db.Timestamptz(6)
+  createdAt           DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  customer    Customer            @relation(fields: [customerId], references: [id])
+  allocations PaymentAllocation[]
+  smsMessages SmsMessage[]
+  lines       InvoiceLine[]
+  charges     Charge[]
+
+  @@unique([customerId, period])
+  @@index([status, dueDate])
+  @@index([period])
+  @@map("invoices")
+}
+
+model Payment {
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  receiptNumber String        @unique @map("receipt_number")
+  customerId    String        @map("customer_id") @db.Uuid
+  amountPoisha  BigInt        @map("amount_poisha")
+  creditPoisha  BigInt        @default(0) @map("credit_poisha")
+  method        PaymentMethod
+  bkashTrxId    String?       @map("bkash_trx_id")
+  status        PaymentStatus @default(POSTED)
+  note          String?
+  receivedBy    String        @map("received_by") @db.Uuid
+  receivedAt    DateTime      @map("received_at") @db.Timestamptz(6)
+  reversedAt    DateTime?     @map("reversed_at") @db.Timestamptz(6)
+  reversedBy    String?       @map("reversed_by") @db.Uuid
+  reverseReason String?       @map("reverse_reason")
+  movedFromCustomerId String? @map("moved_from_customer_id") @db.Uuid
+  movedAt       DateTime?     @map("moved_at") @db.Timestamptz(6)
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  customer    Customer            @relation(fields: [customerId], references: [id])
+  movedFrom   Customer?           @relation("PaymentMovedFrom", fields: [movedFromCustomerId], references: [id])
+  receiver    User                @relation("PaymentReceivedBy", fields: [receivedBy], references: [id])
+  reverser    User?               @relation("PaymentReversedBy", fields: [reversedBy], references: [id])
+  allocations PaymentAllocation[]
+  smsMessages SmsMessage[]
+  bkashTransaction BkashTransaction?
+
+  @@index([customerId, receivedAt])
+  @@index([receivedAt])
+  @@map("payments")
+}
+
+model PaymentAllocation {
+  id           String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  paymentId    String @map("payment_id") @db.Uuid
+  invoiceId    String @map("invoice_id") @db.Uuid
+  amountPoisha BigInt @map("amount_poisha")
+
+  payment Payment @relation(fields: [paymentId], references: [id])
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
+
+  @@index([paymentId])
+  @@index([invoiceId])
+  @@map("payment_allocations")
+}
+
+// Uniqueness per (invoice, type) and (payment, type) is enforced by partial SQL indexes (migration 0003).
+model SmsMessage {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  type         SmsType
+  customerId   String    @map("customer_id") @db.Uuid
+  invoiceId    String?   @map("invoice_id") @db.Uuid
+  paymentId    String?   @map("payment_id") @db.Uuid
+  phone        String
+  body         String
+  status       SmsStatus @default(PENDING)
+  attempts     Int       @default(0)
+  scheduledFor DateTime  @map("scheduled_for") @db.Timestamptz(6)
+  sentAt       DateTime? @map("sent_at") @db.Timestamptz(6)
+  lastError    String?   @map("last_error")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  customer Customer  @relation(fields: [customerId], references: [id])
+  invoice  Invoice?  @relation(fields: [invoiceId], references: [id])
+  payment  Payment?  @relation(fields: [paymentId], references: [id])
+
+  @@index([status, scheduledFor])
+  @@map("sms_messages")
+}
+
+enum BkashTxStatus {
+  POSTED
+  VERIFIED
+  NEEDS_REVIEW
+  ASSIGNED
+  IGNORED
+
+  @@map("bkash_tx_status")
+}
+
+enum BkashReviewReason {
+  NO_REFERENCE_MATCH
+  PHONE_SUGGESTION
+  AMOUNT_MISMATCH
+
+  @@map("bkash_review_reason")
+}
+
+model BkashImportBatch {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fileName       String   @map("file_name")
+  uploadedBy     String   @map("uploaded_by") @db.Uuid
+  totalRows      Int      @map("total_rows")
+  postedCount    Int      @map("posted_count")
+  verifiedCount  Int      @map("verified_count")
+  reviewCount    Int      @map("review_count")
+  duplicateCount Int      @map("duplicate_count")
+  invalidCount   Int      @map("invalid_count")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  uploader     User               @relation(fields: [uploadedBy], references: [id])
+  transactions BkashTransaction[]
+
+  @@map("bkash_import_batches")
+}
+
+// payment_id is unique only when set (partial SQL index in migration 0004).
+model BkashTransaction {
+  id                  String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trxId               String             @unique @map("trx_id")
+  amountPoisha        BigInt             @map("amount_poisha")
+  senderPhone         String?            @map("sender_phone")
+  reference           String?
+  occurredAt          DateTime           @map("occurred_at") @db.Timestamptz(6)
+  status              BkashTxStatus
+  reviewReason        BkashReviewReason? @map("review_reason")
+  suggestedCustomerId String?            @map("suggested_customer_id") @db.Uuid
+  customerId          String?            @map("customer_id") @db.Uuid
+  paymentId           String?            @unique @map("payment_id") @db.Uuid
+  batchId             String             @map("batch_id") @db.Uuid
+  resolvedBy          String?            @map("resolved_by") @db.Uuid
+  resolvedAt          DateTime?          @map("resolved_at") @db.Timestamptz(6)
+  ignoreReason        String?            @map("ignore_reason")
+  createdAt           DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  batch             BkashImportBatch @relation(fields: [batchId], references: [id])
+  customer          Customer?        @relation("BkashCustomer", fields: [customerId], references: [id])
+  suggestedCustomer Customer?        @relation("BkashSuggested", fields: [suggestedCustomerId], references: [id])
+  payment           Payment?         @relation(fields: [paymentId], references: [id])
+  resolver          User?            @relation("BkashResolvedBy", fields: [resolvedBy], references: [id])
+
+  @@index([status, occurredAt])
+  @@index([batchId])
+  @@map("bkash_transactions")
+}
+
+// name is unique case-insensitively through a SQL index on lower(name) (see migration 0005).
+model Router {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String
+  driver         RouterDriver
+  host           String?
+  port           Int          @default(443)
+  useTls         Boolean      @default(true) @map("use_tls")
+  allowSelfSigned Boolean     @default(false) @map("allow_self_signed")
+  username       String?
+  passwordEnc    String?      @map("password_enc")
+  agentTokenHash String?      @map("agent_token_hash")
+  isActive       Boolean      @default(true) @map("is_active")
+  lastSeenAt     DateTime?    @map("last_seen_at") @db.Timestamptz(6)
+  lastError      String?      @map("last_error")
+  secretsSyncedAt DateTime?   @map("secrets_synced_at") @db.Timestamptz(6)
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  subscriptions Subscription[]
+  jobs          NetworkJob[]
+  lines         LineStatus[]
+  usage         UsageDaily[]
+  secrets       RouterSecret[]
+
+  @@map("routers")
+}
+
+// Last known session per router login. Written with bulk raw SQL by the poller (see network.repository).
+model LineStatus {
+  routerId         String    @map("router_id") @db.Uuid
+  pppoeUsername    String    @map("pppoe_username")
+  online           Boolean
+  address          String?
+  callerId         String?   @map("caller_id")
+  sessionStartedAt DateTime? @map("session_started_at") @db.Timestamptz(6)
+  lastOnlineAt     DateTime? @map("last_online_at") @db.Timestamptz(6)
+  rxBytes          BigInt?   @map("rx_bytes")
+  txBytes          BigInt?   @map("tx_bytes")
+  updatedAt        DateTime  @map("updated_at") @db.Timestamptz(6)
+
+  router Router @relation(fields: [routerId], references: [id], onDelete: Cascade)
+
+  @@id([routerId, pppoeUsername])
+  @@map("line_status")
+}
+
+model Expense {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  spentOn      DateTime @map("spent_on") @db.Date
+  category     String
+  amountPoisha BigInt   @map("amount_poisha")
+  payee        String?
+  note         String?
+  createdBy    String   @map("created_by") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  creator User @relation(fields: [createdBy], references: [id])
+
+  @@index([spentOn])
+  @@map("expenses")
+}
+
+model ReportRun {
+  period String   @id
+  sentAt DateTime @map("sent_at") @db.Timestamptz(6)
+
+  @@map("report_runs")
+}
+
+// Snapshot of the router's PPP secrets (bulk raw SQL, see network.repository).
+model RouterSecret {
+  routerId String  @map("router_id") @db.Uuid
+  name     String
+  profile  String?
+  disabled Boolean
+
+  router Router @relation(fields: [routerId], references: [id], onDelete: Cascade)
+
+  @@id([routerId, name])
+  @@map("router_secrets")
+}
+
+// The "one PENDING job per customer" rule is a partial unique index in SQL (migration 0005).
+model NetworkJob {
+  id           String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customerId   String           @map("customer_id") @db.Uuid
+  routerId     String           @map("router_id") @db.Uuid
+  status       NetworkJobStatus @default(PENDING)
+  attempts     Int              @default(0)
+  lastError    String?          @map("last_error")
+  runAfter     DateTime?        @map("run_after") @db.Timestamptz(6)
+  claimedAt    DateTime?        @map("claimed_at") @db.Timestamptz(6)
+  finishedAt   DateTime?        @map("finished_at") @db.Timestamptz(6)
+  appliedState String?          @map("applied_state")
+  createdAt    DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  router   Router   @relation(fields: [routerId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@index([routerId, status])
+  @@map("network_jobs")
+}
+
+enum InvoiceLineKind {
+  PACKAGE
+  DISCOUNT
+  ONE_TIME
+  PRORATION
+
+  @@map("invoice_line_kind")
+}
+
+enum ChargeStatus {
+  PENDING
+  BILLED
+  CANCELLED
+
+  @@map("charge_status")
+}
+
+model InvoiceLine {
+  id           String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  invoiceId    String          @map("invoice_id") @db.Uuid
+  kind         InvoiceLineKind
+  description  String
+  amountPoisha BigInt          @map("amount_poisha")
+  createdAt    DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@map("invoice_lines")
+}
+
+model Charge {
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customerId   String       @map("customer_id") @db.Uuid
+  description  String
+  amountPoisha BigInt       @map("amount_poisha")
+  status       ChargeStatus @default(PENDING)
+  invoiceId    String?      @map("invoice_id") @db.Uuid
+  createdBy    String       @map("created_by") @db.Uuid
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  customer Customer @relation(fields: [customerId], references: [id])
+  invoice  Invoice? @relation(fields: [invoiceId], references: [id])
+  creator  User     @relation("ChargeCreatedBy", fields: [createdBy], references: [id])
+
+  @@index([customerId, status])
+  @@map("charges")
+}
+
+model CollectionTarget {
+  userId       String   @map("user_id") @db.Uuid
+  period       DateTime @db.Date
+  targetPoisha BigInt   @map("target_poisha")
+  updatedAt    DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, period])
+  @@map("collection_targets")
+}
+
+model UsageDaily {
+  routerId      String   @map("router_id") @db.Uuid
+  pppoeUsername String   @map("pppoe_username")
+  day           DateTime @db.Date
+  downloadBytes BigInt   @default(0) @map("download_bytes")
+  uploadBytes   BigInt   @default(0) @map("upload_bytes")
+
+  router Router @relation(fields: [routerId], references: [id], onDelete: Cascade)
+
+  @@id([routerId, pppoeUsername, day])
+  @@index([day])
+  @@map("usage_daily")
+}
+
+// Optical network unit readings. Unique OLT name case-insensitively through a SQL index (migration 0014).
+model Olt {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String
+  brand         String
+  host          String
+  snmpPort      Int       @default(161) @map("snmp_port")
+  communityEnc  String    @map("community_enc")
+  rxOid         String?   @map("rx_oid")
+  idOid         String?   @map("id_oid")
+  divisor       Int?
+  isActive      Boolean   @default(true) @map("is_active")
+  lastPolledAt  DateTime? @map("last_polled_at") @db.Timestamptz(6)
+  lastError     String?   @map("last_error")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  signals OnuSignal[]
+
+  @@map("olts")
+}
+
+model OnuSignal {
+  oltId     String   @map("olt_id") @db.Uuid
+  onuIndex  String   @map("onu_index")
+  onuKey    String   @map("onu_key")
+  rxDbm     Decimal  @map("rx_dbm") @db.Decimal(6, 2)
+  alerted   Boolean  @default(false)
+  updatedAt DateTime @map("updated_at") @db.Timestamptz(6)
+
+  olt Olt @relation(fields: [oltId], references: [id], onDelete: Cascade)
+
+  @@id([oltId, onuIndex])
+  @@map("onu_signals")
+}

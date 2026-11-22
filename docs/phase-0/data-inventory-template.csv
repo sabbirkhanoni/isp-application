@@ -1,0 +1,2 @@
+customer_code,full_name,phone,alternate_phone,address,area,package_name,monthly_price_bdt,connection_type,pppoe_username,router_name,status,balance_due_bdt,join_date,notes
+ISP-EXAMPLE-001,Example Name,01XXXXXXXXX,,"House 1, Road 2",Zone A,10 Mbps,500,PPPOE,example001,router-1,ACTIVE,0,2024-01-15,
