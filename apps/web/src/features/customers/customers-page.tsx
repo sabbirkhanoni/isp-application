@@ -380,7 +380,7 @@ export function CustomersPage() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm min-w-[960px]">
+            <table className="w-full text-left text-sm min-w-[1040px]">
               <thead className="border-b border-line bg-slate-50/80 text-xs font-semibold text-slate-600">
                 <tr>
                   <th className="px-4 py-3 whitespace-nowrap">{t.customers.code}</th>
@@ -390,6 +390,7 @@ export function CustomersPage() {
                   <th className="px-4 py-3 whitespace-nowrap">{t.customers.package}</th>
                   <th className="px-4 py-3 whitespace-nowrap">{t.customers.expiryDate}</th>
                   <th className="px-4 py-3 whitespace-nowrap">{t.customers.status}</th>
+                  <th className="px-4 py-3 whitespace-nowrap">{t.leads.area} & {t.leads.address}</th>
                   <th className="px-4 py-3 text-right whitespace-nowrap">{t.leads.actions}</th>
                 </tr>
               </thead>
@@ -445,9 +446,9 @@ export function CustomersPage() {
                         )}
                       </td>
 
-                      {/* 4. Contact */}
-                      <td className="px-4 py-3 align-top min-w-[170px]">
-                        <div className="flex items-center gap-1.5">
+                      {/* 4. Contact (Phone) */}
+                      <td className="px-4 py-3 align-top whitespace-nowrap min-w-[140px]">
+                        <div className="flex flex-col gap-0.5">
                           <a
                             href={`tel:${c.phone}`}
                             className="font-mono text-xs text-slate-800 hover:text-brand inline-flex items-center gap-1 font-medium"
@@ -456,12 +457,10 @@ export function CustomersPage() {
                             {c.phone}
                           </a>
                           {c.altPhone && (
-                            <span className="text-[11px] text-slate-400">/ {c.altPhone}</span>
+                            <span className="text-[11px] text-slate-400 font-mono">
+                              বিকল্প: {c.altPhone}
+                            </span>
                           )}
-                        </div>
-                        <div className="text-xs text-slate-500 mt-1 line-clamp-2">
-                          {c.area && <span className="font-medium text-slate-700">{c.area} · </span>}
-                          <span>{c.address}</span>
                         </div>
                       </td>
 
@@ -505,7 +504,20 @@ export function CustomersPage() {
                         )}
                       </td>
 
-                      {/* 8. Actions */}
+                      {/* 8. Area & Address (at the end) */}
+                      <td className="px-4 py-3 align-top min-w-[190px]">
+                        <div className="text-xs text-slate-700 flex items-start gap-1.5">
+                          <MapPin className="size-3.5 text-slate-400 shrink-0 mt-0.5" />
+                          <div>
+                            {c.area && (
+                              <span className="font-semibold text-slate-900">{c.area} · </span>
+                            )}
+                            <span className="text-slate-600">{c.address}</span>
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* 9. Actions */}
                       <td className="px-4 py-3 text-right align-top whitespace-nowrap">
                         <div className="flex items-center justify-end gap-1.5">
                           <a
