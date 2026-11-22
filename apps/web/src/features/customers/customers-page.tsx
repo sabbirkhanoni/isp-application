@@ -380,14 +380,14 @@ export function CustomersPage() {
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm min-w-[1040px]">
+            <table className="w-full text-left text-sm min-w-[1100px]">
               <thead className="border-b border-line bg-slate-50/80 text-xs font-semibold text-slate-600">
                 <tr>
                   <th className="px-4 py-3 whitespace-nowrap">{t.customers.code}</th>
                   <th className="px-4 py-3 whitespace-nowrap">{t.leads.fullName}</th>
                   <th className="px-4 py-3 whitespace-nowrap">{t.customers.pppoeUser} & {t.customers.router}</th>
                   <th className="px-4 py-3 whitespace-nowrap">{t.customers.contact}</th>
-                  <th className="px-4 py-3 whitespace-nowrap">{t.customers.package}</th>
+                  <th className="px-4 py-3 whitespace-nowrap min-w-[210px]">{t.customers.package}</th>
                   <th className="px-4 py-3 whitespace-nowrap">{t.customers.expiryDate}</th>
                   <th className="px-4 py-3 whitespace-nowrap">{t.customers.status}</th>
                   <th className="px-4 py-3 whitespace-nowrap">{t.leads.actions}</th>
@@ -464,14 +464,15 @@ export function CustomersPage() {
                         </div>
                       </td>
 
-                      {/* 5. Package Info (without price) */}
-                      <td className="px-4 py-3 align-top min-w-[130px]">
-                        <div className="font-semibold text-slate-900">
+                      {/* 5. Package Info (2 lines: Package Name & Connection Type) */}
+                      <td className="px-4 py-3 align-top min-w-[210px]">
+                        <div className="font-semibold text-slate-900 whitespace-nowrap text-sm">
                           {c.subscription?.packageName ?? '—'}
                         </div>
                         {c.subscription && (
-                          <div className="text-[11px] text-slate-400 mt-0.5">
-                            {t.enums.connectionType[c.subscription.connectionType]}
+                          <div className="text-xs text-slate-500 font-medium mt-0.5 flex items-center gap-1">
+                            <Wifi className="size-3 text-slate-400 shrink-0" />
+                            <span>{t.enums.connectionType[c.subscription.connectionType]}</span>
                           </div>
                         )}
                       </td>
