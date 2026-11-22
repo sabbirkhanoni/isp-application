@@ -20,11 +20,15 @@ type ActivationFormValues = Pick<
   | 'pppoePassword'
 >;
 
+interface ActivationFieldsProps {
+  compactHints?: boolean;
+}
+
 /**
  * The connection + Internet Activation Policy section.
  * Used both when approving a lead and when the admin creates a customer directly (BR-09).
  */
-export function ActivationFields() {
+export function ActivationFields({ compactHints = false }: ActivationFieldsProps = {}) {
   const { t, language } = useI18n();
   const {
     register,
@@ -67,6 +71,7 @@ export function ActivationFields() {
         >
           <Input
             id="act-pppoe"
+            placeholder={compactHints ? 'যেমন: user123' : undefined}
             autoCapitalize="none"
             autoComplete="off"
             {...register('pppoeUsername')}
@@ -77,11 +82,12 @@ export function ActivationFields() {
         <Field
           label={t.activation.pppoePassword}
           htmlFor="act-pppoe-pw"
-          hint={t.activation.pppoePasswordHint}
+          hint={compactHints ? undefined : t.activation.pppoePasswordHint}
           error={errors.pppoePassword && invalid}
         >
           <Input
             id="act-pppoe-pw"
+            placeholder={compactHints ? 'ঐচ্ছিক (পাসওয়ার্ড)' : undefined}
             autoCapitalize="none"
             autoComplete="off"
             {...register('pppoePassword')}
@@ -102,7 +108,11 @@ export function ActivationFields() {
           </Select>
         </Field>
       )}
-      <Field label={t.activation.policy} htmlFor="act-policy" hint={t.activation.policyHint}>
+      <Field
+        label={t.activation.policy}
+        htmlFor="act-policy"
+        hint={compactHints ? undefined : t.activation.policyHint}
+      >
         <Select id="act-policy" {...register('activationPolicy')}>
           {ACTIVATION_POLICIES.map((policy) => (
             <option key={policy} value={policy}>
@@ -111,19 +121,22 @@ export function ActivationFields() {
           ))}
         </Select>
       </Field>
-      <Field
-        label={t.activation.customerCode}
-        htmlFor="act-code"
-        hint={t.activation.customerCodeHint}
-        error={errors.customerCode && invalid}
-      >
-        <Input
-          id="act-code"
-          autoCapitalize="none"
-          autoComplete="off"
-          {...register('customerCode')}
-        />
-      </Field>
+      <div className={compactHints ? 'sm:col-span-2' : undefined}>
+        <Field
+          label={t.activation.customerCode}
+          htmlFor="act-code"
+          hint={compactHints ? undefined : t.activation.customerCodeHint}
+          error={errors.customerCode && invalid}
+        >
+          <Input
+            id="act-code"
+            placeholder={compactHints ? 'ঐচ্ছিক (নতুন হলে ফাঁকা রাখুন)' : undefined}
+            autoCapitalize="none"
+            autoComplete="off"
+            {...register('customerCode')}
+          />
+        </Field>
+      </div>
     </>
   );
 }

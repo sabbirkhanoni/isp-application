@@ -711,21 +711,26 @@ export function CustomersPage() {
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto"
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto"
         >
           <div
             className="fixed inset-0 bg-ink/60 backdrop-blur-[2px] transition-opacity"
             onClick={() => setShowForm(false)}
           />
-          <div className="relative z-10 w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+          <div className="relative z-10 w-full max-w-2xl lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl rounded-2xl bg-white p-5 lg:p-6 shadow-2xl border border-slate-100 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-line pb-3 mb-4">
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">
-                  {t.customers.newCustomerModalTitle}
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  {t.customers.newCustomerModalDesc}
-                </p>
+              <div className="flex items-center gap-2.5">
+                <div className="rounded-xl bg-emerald-50 border border-emerald-200/80 p-2 text-emerald-700">
+                  <UserPlus className="size-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 leading-tight">
+                    {t.customers.newCustomerModalTitle}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {t.customers.newCustomerModalDesc}
+                  </p>
+                </div>
               </div>
               <button
                 type="button"
