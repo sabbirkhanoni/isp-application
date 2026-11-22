@@ -321,7 +321,10 @@ function AdminDashboard() {
                   className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
                 >
                   <UserCheck className="size-5 text-emerald-600" aria-hidden="true" />
-                  <p className="mt-2 text-2xl font-bold">{data.customers.active}</p>
+                  <p className="mt-2 text-2xl font-bold text-slate-900">
+                    {data.customers.active}
+                    <span className="text-sm font-normal text-slate-400">/{totalCustomers}</span>
+                  </p>
                   <p className="text-xs text-slate-500">{t.dashboard.activeCustomers}</p>
                 </Link>
                 <Link
@@ -329,7 +332,10 @@ function AdminDashboard() {
                   className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
                 >
                   <UserPlus className="size-5 text-amber-600" aria-hidden="true" />
-                  <p className="mt-2 text-2xl font-bold">{data.customers.pendingActivation}</p>
+                  <p className="mt-2 text-2xl font-bold text-slate-900">
+                    {data.customers.pendingActivation}
+                    <span className="text-sm font-normal text-slate-400">/{totalCustomers}</span>
+                  </p>
                   <p className="text-xs text-slate-500">{t.dashboard.pendingCustomers}</p>
                 </Link>
                 <Link
@@ -337,7 +343,10 @@ function AdminDashboard() {
                   className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
                 >
                   <PauseCircle className="size-5 text-red-600" aria-hidden="true" />
-                  <p className="mt-2 text-2xl font-bold">{data.customers.suspended}</p>
+                  <p className="mt-2 text-2xl font-bold text-slate-900">
+                    {data.customers.suspended}
+                    <span className="text-sm font-normal text-slate-400">/{totalCustomers}</span>
+                  </p>
                   <p className="text-xs text-slate-500">{t.dashboard.suspendedCustomers}</p>
                 </Link>
                 {data.customers.terminated > 0 && (
@@ -346,7 +355,10 @@ function AdminDashboard() {
                     className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
                   >
                     <UserX className="size-5 text-slate-400" aria-hidden="true" />
-                    <p className="mt-2 text-2xl font-bold text-slate-600">{data.customers.terminated}</p>
+                    <p className="mt-2 text-2xl font-bold text-slate-600">
+                      {data.customers.terminated}
+                      <span className="text-sm font-normal text-slate-400">/{totalCustomers}</span>
+                    </p>
                     <p className="text-xs text-slate-500">{t.dashboard.terminatedCustomers}</p>
                   </Link>
                 )}
@@ -357,6 +369,9 @@ function AdminDashboard() {
                     <span className="flex items-center gap-2 font-semibold">
                       <Radio className="size-4 text-brand" aria-hidden="true" />
                       {t.dashboard.linesTitle}
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">
+                        {lineSummary.online} / {lineSummary.managed} {t.lines.online} ({onlinePct}%)
+                      </span>
                     </span>
                     <Link to="/network/lines" className="text-brand hover:underline">
                       {t.dashboard.linesOpen}
@@ -366,8 +381,13 @@ function AdminDashboard() {
                     <div className="bg-emerald-500" style={{ width: `${onlinePct}%` }} />
                   </div>
                   <p className="text-sm text-slate-600">
-                    <b className="text-emerald-600">{lineSummary.online}</b> {t.lines.online} ·{' '}
-                    <b>{lineSummary.offline}</b> {t.lines.offline}
+                    <b className="text-emerald-600">{lineSummary.online}</b>/{lineSummary.managed}{' '}
+                    {t.lines.online} ·{' '}
+                    <b className="text-slate-700">{lineSummary.offline}</b>/{lineSummary.managed}{' '}
+                    {t.lines.offline}
+                    <span className="ml-1 text-xs text-slate-500">
+                      ({t.dashboard.totalLines}: {lineSummary.managed})
+                    </span>
                   </p>
                 </div>
               )}

@@ -398,6 +398,7 @@ export const en = {
     fiberCritical: 'Weak fiber signal (below -27 dBm)',
     linesTitle: 'Lines now',
     linesOpen: 'Open lines screen',
+    totalLines: 'Total lines',
     welcome: 'Welcome',
     ofBilled: 'of {amount} billed this month',
     collectedShare: 'of the bills collected',

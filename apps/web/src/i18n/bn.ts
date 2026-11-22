@@ -393,6 +393,7 @@ export const bn: Dictionary = {
     fiberCritical: 'দুর্বল ফাইবার সিগন্যাল (-২৭ dBm-এর নিচে)',
     linesTitle: 'এখন লাইনের অবস্থা',
     linesOpen: 'লাইনের পেজ খুলুন',
+    totalLines: 'মোট লাইন',
     ofBilled: 'এই মাসের {amount} বিলের মধ্যে',
     collectedShare: 'বিল আদায় হয়েছে',
     welcome: 'স্বাগতম',
