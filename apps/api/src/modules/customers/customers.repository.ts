@@ -29,8 +29,27 @@ export class PrismaCustomerRepository implements CustomerRepository {
     private readonly credentials: PppoeCredentials,
   ) {}
 
-  findById(id: string): Promise<CustomerWithSubscription | null> {
-    return this.db.customer.findUnique({ where: { id }, include: WITH_SUBSCRIPTION });
+  async findById(id: string): Promise<CustomerWithSubscription | null> {
+    const customer = await this.db.customer.findUnique({ where: { id }, include: WITH_SUBSCRIPTION });
+    if (!customer) return null;
+    let online: boolean | null = null;
+    const sub = customer.subscription;
+    if (sub?.routerId && sub?.pppoeUsername) {
+      const ls = await this.db.lineStatus.findUnique({
+        where: {
+          routerId_pppoeUsername: {
+            routerId: sub.routerId,
+            pppoeUsername: sub.pppoeUsername,
+          },
+        },
+        select: { online: true },
+      });
+      online = ls?.online ?? null;
+    }
+    return {
+      ...customer,
+      online,
+    };
   }
 
   async list(query: ListCustomersQuery) {
@@ -48,7 +67,7 @@ export class PrismaCustomerRepository implements CustomerRepository {
           }
         : {}),
     };
-    const [items, total] = await this.db.$transaction([
+    const [rawItems, total] = await this.db.$transaction([
       this.db.customer.findMany({
         where,
         include: WITH_SUBSCRIPTION,
@@ -58,6 +77,42 @@ export class PrismaCustomerRepository implements CustomerRepository {
       }),
       this.db.customer.count({ where }),
     ]);
+
+    const pairs = rawItems
+      .filter((c) => c.subscription?.routerId && c.subscription?.pppoeUsername)
+      .map((c) => ({
+        routerId: c.subscription!.routerId!,
+        pppoeUsername: c.subscription!.pppoeUsername!,
+      }));
+
+    let lineStatusMap = new Map<string, boolean>();
+    if (pairs.length > 0) {
+      const statuses = await this.db.lineStatus.findMany({
+        where: {
+          OR: pairs.map((p) => ({
+            routerId: p.routerId,
+            pppoeUsername: p.pppoeUsername,
+          })),
+        },
+        select: { routerId: true, pppoeUsername: true, online: true },
+      });
+      lineStatusMap = new Map(
+        statuses.map((s) => [`${s.routerId}:${s.pppoeUsername.toLowerCase()}`, s.online]),
+      );
+    }
+
+    const items = rawItems.map((c) => {
+      const sub = c.subscription;
+      const isOnline =
+        sub?.routerId && sub?.pppoeUsername
+          ? lineStatusMap.get(`${sub.routerId}:${sub.pppoeUsername.toLowerCase()}`) ?? null
+          : null;
+      return {
+        ...c,
+        online: isOnline,
+      };
+    });
+
     return { items, total };
   }
 

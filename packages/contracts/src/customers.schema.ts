@@ -145,6 +145,7 @@ export interface CustomerDto {
   suspendReason: SuspendReason | null;
   subscription: SubscriptionDto | null;
   billingPeriod?: CustomerBillingPeriodDto | null;
+  online?: boolean | null;
   createdAt: string;
 }
 

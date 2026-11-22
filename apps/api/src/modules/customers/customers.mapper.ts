@@ -4,6 +4,7 @@ import type { Customer, Package, Router, Subscription } from '../../generated/pr
 export type CustomerWithSubscription = Customer & {
   subscription: (Subscription & { package: Package; router: Router | null }) | null;
   invoices?: Array<{ period: Date; dueDate: Date }> | null;
+  online?: boolean | null;
 };
 
 export function toCustomerDto(customer: CustomerWithSubscription): CustomerDto {
@@ -58,6 +59,7 @@ export function toCustomerDto(customer: CustomerWithSubscription): CustomerDto {
       onuSerial: sub.onuSerial,
     },
     billingPeriod,
+    online: customer.online ?? null,
     createdAt: customer.createdAt.toISOString(),
   };
 }

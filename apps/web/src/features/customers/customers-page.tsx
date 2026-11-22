@@ -7,6 +7,7 @@ import {
   Clock,
   FileSpreadsheet,
   LayoutGrid,
+  Lightbulb,
   MapPin,
   PauseCircle,
   Phone,
@@ -429,15 +430,39 @@ export function CustomersPage() {
                         )}
                       </td>
 
-                      {/* 3. PPPoE Username & Router */}
-                      <td className="px-4 py-3 align-top min-w-[160px]">
-                        {c.subscription?.pppoeUsername ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-mono text-xs font-semibold border border-slate-200">
-                            {c.subscription.pppoeUsername}
-                          </span>
-                        ) : (
-                          <span className="text-slate-400 text-xs">—</span>
-                        )}
+                      {/* 3. PPPoE Username & Router with Idea Bulb Status */}
+                      <td className="px-4 py-3 align-top min-w-[170px]">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {c.subscription?.pppoeUsername ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 text-slate-800 font-mono text-xs font-semibold border border-slate-200">
+                              {c.subscription.pppoeUsername}
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 text-xs">—</span>
+                          )}
+
+                          {/* Idea Lightbulb Online/Offline Indicator */}
+                          {c.subscription?.pppoeUsername && (
+                            <span
+                              className="inline-flex shrink-0 items-center justify-center cursor-help"
+                              title={
+                                c.status === 'ACTIVE' && c.online === true
+                                  ? 'লাইন চালু আছে (Online)'
+                                  : 'লাইন অফলাইন / সমস্যা আছে (Offline)'
+                              }
+                            >
+                              {c.status === 'ACTIVE' && c.online === true ? (
+                                <span className="relative flex items-center justify-center size-5 rounded-full bg-amber-50 border border-amber-300 shadow-2xs">
+                                  <Lightbulb className="size-3.5 text-amber-600 fill-amber-400 animate-pulse" />
+                                </span>
+                              ) : (
+                                <span className="relative flex items-center justify-center size-5 rounded-full bg-slate-100 border border-slate-200">
+                                  <Lightbulb className="size-3.5 text-slate-400 fill-slate-200" />
+                                </span>
+                              )}
+                            </span>
+                          )}
+                        </div>
                         {c.subscription?.routerName && (
                           <div className="text-[11px] text-slate-500 truncate max-w-[150px] mt-1 flex items-center gap-1">
                             <Radio className="size-3 text-slate-400 shrink-0" />
@@ -589,13 +614,33 @@ export function CustomersPage() {
                       </div>
                     </div>
 
-                    {/* PPPoE Username & Router */}
+                    {/* PPPoE Username & Router with Idea Bulb */}
                     {c.subscription?.pppoeUsername && (
                       <div className="flex items-center justify-between text-slate-600 pt-1 border-t border-slate-100">
                         <span>{t.customers.pppoeUser}:</span>
-                        <span className="font-mono text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded text-[11px] font-medium border border-slate-200">
-                          {c.subscription.pppoeUsername}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono text-slate-800 bg-slate-100 px-1.5 py-0.5 rounded text-[11px] font-medium border border-slate-200">
+                            {c.subscription.pppoeUsername}
+                          </span>
+                          <span
+                            className="inline-flex shrink-0 items-center justify-center cursor-help"
+                            title={
+                              c.status === 'ACTIVE' && c.online === true
+                                ? 'লাইন চালু আছে (Online)'
+                                : 'লাইন অফলাইন / সমস্যা আছে (Offline)'
+                            }
+                          >
+                            {c.status === 'ACTIVE' && c.online === true ? (
+                              <span className="relative flex items-center justify-center size-5 rounded-full bg-amber-50 border border-amber-300 shadow-2xs">
+                                <Lightbulb className="size-3.5 text-amber-600 fill-amber-400 animate-pulse" />
+                              </span>
+                            ) : (
+                              <span className="relative flex items-center justify-center size-5 rounded-full bg-slate-100 border border-slate-200">
+                                <Lightbulb className="size-3.5 text-slate-400 fill-slate-200" />
+                              </span>
+                            )}
+                          </span>
+                        </div>
                       </div>
                     )}
                     {c.subscription?.routerName && (
