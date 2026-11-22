@@ -36,7 +36,7 @@ export class LeadsController {
   };
 
   reject = async (req: Request, res: Response): Promise<void> => {
-    const input = parseRequest(rejectLeadSchema, req.body);
+    const input = parseRequest(rejectLeadSchema, req.body ?? {});
     const id = requireIdParam(req, 'lead id');
     sendData(
       res,

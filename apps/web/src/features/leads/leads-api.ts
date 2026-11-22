@@ -20,4 +20,4 @@ export const createLead = (input: CreateLeadInput) => api.post<LeadDto>('/leads'
 export const approveLead = (id: string, input: ApproveLeadInput) =>
   api.post<{ lead: LeadDto; customer: CustomerDto }>(`/leads/${id}/approve`, input);
 export const rejectLead = (id: string, reason?: string) =>
-  api.post<LeadDto>(`/leads/${id}/reject`, { reason });
+  api.post<LeadDto>(`/leads/${id}/reject`, reason ? { reason } : {});

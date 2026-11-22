@@ -27,7 +27,12 @@ export type CreateLeadInput = z.infer<typeof createLeadSchema>;
 export const approveLeadSchema = z.object(activationFields).superRefine(requirePppoeUsername);
 export type ApproveLeadInput = z.infer<typeof approveLeadSchema>;
 
-export const rejectLeadSchema = z.object({ reason: z.string().trim().max(300).optional().nullable() });
+export const rejectLeadSchema = z.object({
+  reason: z.preprocess(
+    (val) => (typeof val === 'string' && val.trim() === '' ? null : val),
+    z.string().trim().max(300).optional().nullable(),
+  ).default(null),
+});
 export type RejectLeadInput = z.infer<typeof rejectLeadSchema>;
 
 export const listLeadsQuerySchema = paginationQuerySchema.extend({
