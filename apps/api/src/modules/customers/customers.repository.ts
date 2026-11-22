@@ -7,7 +7,14 @@ import { enqueueNetworkSync } from '../network/network-queue.js';
 import { createCustomerWithSubscription, type NewCustomerRecord } from './customer-record.js';
 import type { CustomerWithSubscription } from './customers.mapper.js';
 
-const WITH_SUBSCRIPTION = { subscription: { include: { package: true, router: true } } } as const;
+const WITH_SUBSCRIPTION = {
+  subscription: { include: { package: true, router: true } },
+  invoices: {
+    orderBy: { period: 'desc' as const },
+    take: 1,
+    select: { period: true, dueDate: true },
+  },
+} as const;
 
 export interface CustomerRepository {
   findById(id: string): Promise<CustomerWithSubscription | null>;

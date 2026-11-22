@@ -604,6 +604,7 @@ export const en = {
     cardView: 'Card View',
     newCustomerModalTitle: 'Add New Customer',
     newCustomerModalDesc: 'Enter customer contact, address and package setup to add them directly.',
+    expiryDate: 'Expiry Date',
   },
 
   billing: {

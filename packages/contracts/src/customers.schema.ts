@@ -125,6 +125,11 @@ export interface SubscriptionDto {
   onuSerial: string | null;
 }
 
+export interface CustomerBillingPeriodDto {
+  startDate: string;
+  expiryDate: string;
+}
+
 export interface CustomerDto {
   id: string;
   customerCode: string;
@@ -139,6 +144,7 @@ export interface CustomerDto {
   status: CustomerStatus;
   suspendReason: SuspendReason | null;
   subscription: SubscriptionDto | null;
+  billingPeriod?: CustomerBillingPeriodDto | null;
   createdAt: string;
 }
 

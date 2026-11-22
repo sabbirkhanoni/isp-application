@@ -598,6 +598,7 @@ export const bn: Dictionary = {
     cardView: 'কার্ড ভিউ',
     newCustomerModalTitle: 'নতুন গ্রাহক যোগ করুন',
     newCustomerModalDesc: 'নতুন গ্রাহকের নাম, ফোন, ঠিকানা ও প্যাকেজ তথ্য দিয়ে সরাসরি যুক্ত করুন।',
+    expiryDate: 'মেয়াদ (Expiry Date)',
   },
 
   billing: {

@@ -3,10 +3,33 @@ import type { Customer, Package, Router, Subscription } from '../../generated/pr
 
 export type CustomerWithSubscription = Customer & {
   subscription: (Subscription & { package: Package; router: Router | null }) | null;
+  invoices?: Array<{ period: Date; dueDate: Date }> | null;
 };
 
 export function toCustomerDto(customer: CustomerWithSubscription): CustomerDto {
   const sub = customer.subscription;
+  const latestInvoice = customer.invoices?.[0];
+  const formatDateOnly = (d: Date | string | null | undefined): string => {
+    if (!d) return '';
+    const date = typeof d === 'string' ? new Date(d) : d;
+    return date.toISOString().slice(0, 10);
+  };
+
+  const billingPeriod = latestInvoice
+    ? {
+        startDate: formatDateOnly(latestInvoice.period),
+        expiryDate: formatDateOnly(latestInvoice.dueDate),
+      }
+    : customer.joinedOn
+      ? {
+          startDate: formatDateOnly(customer.joinedOn),
+          expiryDate: formatDateOnly(customer.joinedOn),
+        }
+      : {
+          startDate: formatDateOnly(customer.createdAt),
+          expiryDate: formatDateOnly(customer.createdAt),
+        };
+
   return {
     id: customer.id,
     customerCode: customer.customerCode,
@@ -34,6 +57,7 @@ export function toCustomerDto(customer: CustomerWithSubscription): CustomerDto {
       ponPort: sub.ponPort,
       onuSerial: sub.onuSerial,
     },
+    billingPeriod,
     createdAt: customer.createdAt.toISOString(),
   };
 }
