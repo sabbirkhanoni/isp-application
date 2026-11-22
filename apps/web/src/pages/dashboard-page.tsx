@@ -14,6 +14,7 @@ import {
   UserCheck,
   UserPlus,
   Users,
+  UserX,
   Wallet,
   type LucideIcon,
 } from 'lucide-react';
@@ -301,7 +302,12 @@ function AdminDashboard() {
                   {t.customers.title} →
                 </Link>
               </div>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div
+                className={cn(
+                  'grid grid-cols-2 gap-3',
+                  data.customers.terminated > 0 ? 'sm:grid-cols-3 lg:grid-cols-5' : 'sm:grid-cols-4',
+                )}
+              >
                 <Link
                   to="/customers"
                   className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
@@ -334,6 +340,16 @@ function AdminDashboard() {
                   <p className="mt-2 text-2xl font-bold">{data.customers.suspended}</p>
                   <p className="text-xs text-slate-500">{t.dashboard.suspendedCustomers}</p>
                 </Link>
+                {data.customers.terminated > 0 && (
+                  <Link
+                    to="/customers"
+                    className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
+                  >
+                    <UserX className="size-5 text-slate-400" aria-hidden="true" />
+                    <p className="mt-2 text-2xl font-bold text-slate-600">{data.customers.terminated}</p>
+                    <p className="text-xs text-slate-500">{t.dashboard.terminatedCustomers}</p>
+                  </Link>
+                )}
               </div>
               {lineSummary && lineSummary.managed > 0 && (
                 <div className="space-y-2 border-t border-line pt-4">

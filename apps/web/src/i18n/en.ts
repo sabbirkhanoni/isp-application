@@ -408,6 +408,7 @@ export const en = {
     activeCustomers: 'Active',
     pendingCustomers: 'Waiting for activation',
     suspendedCustomers: 'Suspended',
+    terminatedCustomers: 'Left',
     invoiced: 'Billed this month',
     collected: 'Collected this month',
     cash: 'Cash',

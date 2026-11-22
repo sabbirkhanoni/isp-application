@@ -403,6 +403,7 @@ export const bn: Dictionary = {
     activeCustomers: 'চালু',
     pendingCustomers: 'চালুর অপেক্ষায়',
     suspendedCustomers: 'বন্ধ',
+    terminatedCustomers: 'সংযোগ বিচ্ছিন্ন',
     invoiced: 'এই মাসের বিল',
     collected: 'এই মাসে আদায়',
     cash: 'নগদ',
