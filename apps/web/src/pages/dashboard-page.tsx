@@ -1,6 +1,7 @@
 import type { ReportSummaryDto } from '@isp/contracts';
 import { useQuery } from '@tanstack/react-query';
 import {
+  Activity,
   AlertTriangle,
   CheckCircle2,
   Download,
@@ -16,6 +17,7 @@ import {
   Users,
   UserX,
   Wallet,
+  WifiOff,
   type LucideIcon,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -352,33 +354,90 @@ function AdminDashboard() {
                 </Link>
               )}
             </div>
-            {lineSummary && lineSummary.managed > 0 && (
-              <div className="space-y-2 border-t border-line pt-4">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-2 font-semibold">
-                    <Radio className="size-4 text-brand" aria-hidden="true" />
-                    {t.dashboard.linesTitle}
-                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">
-                      {lineSummary.online} / {lineSummary.managed} {t.lines.online} ({onlinePct}%)
-                    </span>
+          </Card>
+
+          {lineSummary && lineSummary.managed > 0 && (
+            <Card className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="flex size-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                    <Radio className="size-4" aria-hidden="true" />
                   </span>
-                  <Link to="/network/lines" className="text-brand hover:underline">
-                    {t.dashboard.linesOpen}
-                  </Link>
+                  <h2 className="font-semibold">{t.dashboard.linesTitle}</h2>
+                  <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
+                    {lineSummary.online} / {lineSummary.managed} {t.lines.online} ({onlinePct}%)
+                  </span>
+                </div>
+                <Link to="/network/lines" className="text-xs font-medium text-brand hover:underline">
+                  {t.dashboard.linesOpen} →
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <Link
+                  to="/network/lines?filter=ONLINE"
+                  className="rounded-xl bg-emerald-50/60 p-3 transition hover:bg-emerald-50"
+                >
+                  <div className="flex items-center justify-between">
+                    <CheckCircle2 className="size-5 text-emerald-600" aria-hidden="true" />
+                    <span className="text-xs font-semibold text-emerald-700">{onlinePct}%</span>
+                  </div>
+                  <p className="mt-2 text-2xl font-bold text-emerald-700">{lineSummary.online}</p>
+                  <p className="text-xs text-emerald-800">{t.lines.online}</p>
+                </Link>
+
+                <Link
+                  to="/network/lines?filter=OFFLINE"
+                  className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
+                >
+                  <div className="flex items-center justify-between">
+                    <WifiOff className="size-5 text-slate-500" aria-hidden="true" />
+                    <span className="text-xs font-semibold text-slate-500">
+                      {100 - onlinePct}%
+                    </span>
+                  </div>
+                  <p className="mt-2 text-2xl font-bold text-slate-800">{lineSummary.offline}</p>
+                  <p className="text-xs text-slate-500">{t.lines.offline}</p>
+                </Link>
+
+                <Link
+                  to="/network/lines"
+                  className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
+                >
+                  <Radio className="size-5 text-brand" aria-hidden="true" />
+                  <p className="mt-2 text-2xl font-bold text-slate-900">{lineSummary.managed}</p>
+                  <p className="text-xs text-slate-500">{t.dashboard.totalLines}</p>
+                </Link>
+
+                <div className="rounded-xl bg-slate-50 p-3">
+                  <Activity className="size-5 text-brand" aria-hidden="true" />
+                  <p className="mt-2 text-2xl font-bold text-slate-900">
+                    {lineSummary.online} / {lineSummary.managed}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {t.lines.online} অনুপাত ({onlinePct}%)
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-xs font-medium text-slate-500">
+                  <span className="text-emerald-700">
+                    <b>{lineSummary.online}</b> {t.lines.online}
+                  </span>
+                  <span className="text-slate-600">
+                    <b>{lineSummary.offline}</b> {t.lines.offline}
+                  </span>
                 </div>
                 <div className="flex h-2.5 overflow-hidden rounded-full bg-slate-100">
-                  <div className="bg-emerald-500" style={{ width: `${onlinePct}%` }} />
+                  <div
+                    className="bg-emerald-500 transition-all duration-500"
+                    style={{ width: `${onlinePct}%` }}
+                  />
                 </div>
-                <p className="text-sm text-slate-600">
-                  <b className="text-emerald-600">{lineSummary.online}</b> {t.lines.online} ·{' '}
-                  <b className="text-slate-700">{lineSummary.offline}</b> {t.lines.offline}
-                  <span className="ml-1 text-xs text-slate-500">
-                    ({t.dashboard.totalLines}: {lineSummary.managed})
-                  </span>
-                </p>
               </div>
-            )}
-          </Card>
+            </Card>
+          )}
 
           <Card className="space-y-3">
             <div className="flex items-center justify-between">
