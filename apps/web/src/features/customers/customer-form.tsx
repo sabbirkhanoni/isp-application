@@ -13,10 +13,11 @@ import { ActivationFields } from './activation-fields';
 interface CustomerFormProps {
   onSubmit(input: CreateCustomerInput): Promise<void>;
   onCancel(): void;
+  className?: string;
 }
 
 /** Admin creates a customer directly: contact details + the same activation section as lead approval. */
-export function CustomerForm({ onSubmit, onCancel }: CustomerFormProps) {
+export function CustomerForm({ onSubmit, onCancel, className }: CustomerFormProps) {
   const { t } = useI18n();
   const toMessage = useErrorMessage();
   const [message, setMessage] = useState<string | null>(null);
@@ -44,7 +45,7 @@ export function CustomerForm({ onSubmit, onCancel }: CustomerFormProps) {
   });
 
   return (
-    <Card>
+    <Card className={className}>
       <FormProvider {...form}>
         <form onSubmit={submit} noValidate className="grid gap-4 md:grid-cols-2">
           {message && (
