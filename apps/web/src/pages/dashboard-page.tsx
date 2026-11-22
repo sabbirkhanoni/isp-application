@@ -188,6 +188,12 @@ function AdminDashboard() {
   const lineSummary = lines.data?.summary;
   const data = summary.data;
   const money = (poisha: number) => formatMoney(poisha, language);
+  const totalCustomers = data
+    ? data.customers.active +
+      data.customers.pendingActivation +
+      data.customers.suspended +
+      (data.customers.terminated ?? 0)
+    : 0;
   const attention = data
     ? [
         {
@@ -284,8 +290,26 @@ function AdminDashboard() {
 
           <div className="grid gap-4 lg:grid-cols-3">
             <Card className="space-y-4 lg:col-span-2">
-              <h2 className="font-semibold">{t.dashboard.customers}</h2>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <h2 className="font-semibold">{t.dashboard.customers}</h2>
+                  <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-700">
+                    {t.dashboard.totalCustomers}: {totalCustomers}
+                  </span>
+                </div>
+                <Link to="/customers" className="text-xs font-medium text-brand hover:underline">
+                  {t.customers.title} →
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <Link
+                  to="/customers"
+                  className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"
+                >
+                  <Users className="size-5 text-brand" aria-hidden="true" />
+                  <p className="mt-2 text-2xl font-bold">{totalCustomers}</p>
+                  <p className="text-xs text-slate-500">{t.dashboard.totalCustomers}</p>
+                </Link>
                 <Link
                   to="/customers"
                   className="rounded-xl bg-slate-50 p-3 transition hover:bg-slate-100"

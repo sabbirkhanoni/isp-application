@@ -399,6 +399,7 @@ export const bn: Dictionary = {
     placeholder: 'দ্রুত লিংক',
     month: 'মাস',
     customers: 'গ্রাহক',
+    totalCustomers: 'মোট গ্রাহক',
     activeCustomers: 'চালু',
     pendingCustomers: 'চালুর অপেক্ষায়',
     suspendedCustomers: 'বন্ধ',

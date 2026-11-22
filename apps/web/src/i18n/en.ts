@@ -404,6 +404,7 @@ export const en = {
     placeholder: 'Quick links',
     month: 'Month',
     customers: 'Customers',
+    totalCustomers: 'Total Customers',
     activeCustomers: 'Active',
     pendingCustomers: 'Waiting for activation',
     suspendedCustomers: 'Suspended',
