@@ -520,6 +520,9 @@ export const en = {
     connection: 'Connection',
     actions: 'Actions',
     date: 'Date',
+    tableView: 'Table View',
+    cardView: 'Card View',
+    scrollHint: 'Scroll right to view all columns →',
   },
   customers: {
     import: {

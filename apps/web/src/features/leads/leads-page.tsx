@@ -2,12 +2,19 @@ import { LEAD_STATUSES, type LeadDto } from '@isp/contracts';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   AlertTriangle,
+  Calendar,
   Check,
   CheckCircle2,
   ClipboardList,
   Clock,
+  LayoutGrid,
+  MapPin,
+  Phone,
+  Table as TableIcon,
+  User,
   UserPlus,
   Users,
+  Wifi,
   X,
   XCircle,
 } from 'lucide-react';
@@ -38,6 +45,7 @@ export function LeadsPage() {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState('');
+  const [viewMode, setViewMode] = useState<'table' | 'cards'>('table');
   const [approving, setApproving] = useState<LeadDto | null>(null);
   const [rejecting, setRejecting] = useState<LeadDto | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -258,6 +266,36 @@ export function LeadsPage() {
           </div>
 
           <div className="flex items-center gap-2">
+            <div className="flex rounded-lg border border-line bg-slate-100 p-0.5 text-xs font-medium">
+              <button
+                type="button"
+                onClick={() => setViewMode('table')}
+                title={t.leads.tableView}
+                className={cn(
+                  'flex items-center gap-1 rounded-md px-2.5 py-1.5 transition',
+                  viewMode === 'table'
+                    ? 'bg-white font-semibold text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                )}
+              >
+                <TableIcon className="size-3.5" aria-hidden="true" />
+                <span className="hidden md:inline">{t.leads.tableView}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('cards')}
+                title={t.leads.cardView}
+                className={cn(
+                  'flex items-center gap-1 rounded-md px-2.5 py-1.5 transition',
+                  viewMode === 'cards'
+                    ? 'bg-white font-semibold text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                )}
+              >
+                <LayoutGrid className="size-3.5" aria-hidden="true" />
+                <span className="hidden md:inline">{t.leads.cardView}</span>
+              </button>
+            </div>
             <div className="hidden sm:flex rounded-lg border border-line bg-slate-100 p-0.5 text-xs font-medium">
               <button
                 type="button"
@@ -297,109 +335,234 @@ export function LeadsPage() {
           </div>
         </div>
 
-        <Card className="overflow-x-auto p-0 border border-line shadow-sm">
-          {list.isPending && <Loading />}
-          {list.isError && <p className="p-6 text-red-700">{t.common.genericError}</p>}
-          {list.data?.leads.length === 0 && (
+        {list.isPending && (
+          <Card className="p-0 border border-line shadow-sm">
+            <Loading />
+          </Card>
+        )}
+        {list.isError && (
+          <Card className="p-6 border border-line shadow-sm">
+            <p className="text-red-700">{t.common.genericError}</p>
+          </Card>
+        )}
+        {list.data?.leads.length === 0 && (
+          <Card className="p-0 border border-line shadow-sm">
             <div className="py-12 text-center">
               <Users className="mx-auto size-10 text-slate-300" aria-hidden="true" />
               <p className="mt-3 text-sm text-slate-500">{t.leads.empty}</p>
             </div>
-          )}
-          {list.data && list.data.leads.length > 0 && (
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-line bg-slate-50/80 text-xs font-semibold text-slate-600">
-                <tr>
-                  <th className="px-4 py-3">{t.leads.date}</th>
-                  <th className="px-4 py-3">{t.leads.customerInfo}</th>
-                  <th className="hidden px-4 py-3 sm:table-cell">{t.leads.address} & {t.leads.area}</th>
-                  <th className="hidden px-4 py-3 md:table-cell">{t.leads.requestedPackage}</th>
-                  <th className="hidden px-4 py-3 lg:table-cell">{t.leads.submittedBy}</th>
-                  <th className="px-4 py-3">{t.customers.status}</th>
-                  <th className="px-4 py-3 text-right">{t.leads.actions}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-line">
-                {list.data.leads.map((lead) => (
-                  <tr key={lead.id} className="transition hover:bg-slate-50/70">
-                    <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap align-top">
-                      {formatDateTime(lead.createdAt, language)}
-                    </td>
-                    <td className="px-4 py-3 align-top">
-                      <div className="font-semibold text-slate-900">{lead.fullName}</div>
-                      <a href={`tel:${lead.phone}`} className="text-xs text-slate-600 font-mono hover:text-brand">
+          </Card>
+        )}
+        {list.data && list.data.leads.length > 0 && viewMode === 'table' && (
+          <Card className="overflow-hidden p-0 border border-line shadow-sm">
+            <div className="flex items-center justify-between px-4 py-2 bg-slate-50 border-b border-line text-[11px] text-slate-500 sm:hidden">
+              <span>{t.leads.scrollHint}</span>
+              <button
+                type="button"
+                onClick={() => setViewMode('cards')}
+                className="font-medium text-brand hover:underline"
+              >
+                {t.leads.cardView}
+              </button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm min-w-[820px]">
+                <thead className="border-b border-line bg-slate-50/80 text-xs font-semibold text-slate-600">
+                  <tr>
+                    <th className="px-4 py-3 whitespace-nowrap">{t.leads.date}</th>
+                    <th className="px-4 py-3 whitespace-nowrap">{t.leads.customerInfo}</th>
+                    <th className="px-4 py-3 whitespace-nowrap">{t.leads.address} & {t.leads.area}</th>
+                    <th className="px-4 py-3 whitespace-nowrap">{t.leads.requestedPackage}</th>
+                    <th className="px-4 py-3 whitespace-nowrap">{t.leads.submittedBy}</th>
+                    <th className="px-4 py-3 whitespace-nowrap">{t.customers.status}</th>
+                    <th className="px-4 py-3 text-right whitespace-nowrap">{t.leads.actions}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line">
+                  {list.data.leads.map((lead) => (
+                    <tr key={lead.id} className="transition hover:bg-slate-50/70">
+                      <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap align-top">
+                        {formatDateTime(lead.createdAt, language)}
+                      </td>
+                      <td className="px-4 py-3 align-top min-w-[170px]">
+                        <div className="font-semibold text-slate-900">{lead.fullName}</div>
+                        <a href={`tel:${lead.phone}`} className="text-xs text-slate-600 font-mono hover:text-brand">
+                          {lead.phone}
+                        </a>
+                        {lead.note && (
+                          <div className="mt-1 text-xs text-slate-500 italic max-w-xs">
+                            {lead.note}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-slate-600 align-top min-w-[180px]">
+                        {lead.area && <span className="font-medium text-slate-800">{lead.area} · </span>}
+                        <span>{lead.address}</span>
+                      </td>
+                      <td className="px-4 py-3 text-xs align-top min-w-[140px]">
+                        <div className="font-medium text-slate-900">
+                          {lead.requestedPackageName ?? t.leads.anyPackage}
+                        </div>
+                        <div className="text-slate-500">
+                          {t.enums.connectionType[lead.connectionType]}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-xs text-slate-600 align-top min-w-[120px]">
+                        {lead.createdByName}
+                      </td>
+                      <td className="px-4 py-3 align-top whitespace-nowrap">
+                        <Badge tone={TONES[lead.status]}>{t.enums.leadStatus[lead.status]}</Badge>
+                        {lead.rejectReason && (
+                          <p className="mt-1 text-xs text-red-600 max-w-xs">{lead.rejectReason}</p>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-right align-top whitespace-nowrap">
+                        {canReview && lead.status === 'PENDING' && (
+                          <div className="flex items-center justify-end gap-1.5">
+                            <Button
+                              size="sm"
+                              className="h-8 bg-emerald-600 px-2.5 text-xs text-white hover:bg-emerald-700 font-medium"
+                              onClick={() => {
+                                setRejecting(null);
+                                setApproving(lead);
+                              }}
+                            >
+                              <Check className="mr-1 size-3.5" aria-hidden="true" />
+                              {t.leads.approve}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 border-red-200 px-2.5 text-xs font-medium text-red-600 hover:border-red-300 hover:bg-red-50 hover:text-red-700"
+                              onClick={() => {
+                                setApproving(null);
+                                setRejecting(lead);
+                              }}
+                            >
+                              <X className="mr-1 size-3.5" aria-hidden="true" />
+                              {t.leads.reject}
+                            </Button>
+                          </div>
+                        )}
+                        {lead.customerId && (
+                          <Link
+                            className="inline-flex items-center gap-1 text-xs font-medium text-brand hover:underline"
+                            to={`/customers/${lead.customerId}`}
+                          >
+                            {t.leads.openCustomer} →
+                          </Link>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        )}
+        {list.data && list.data.leads.length > 0 && viewMode === 'cards' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            {list.data.leads.map((lead) => (
+              <Card key={lead.id} className="p-4 border border-line shadow-sm hover:border-slate-300 transition flex flex-col justify-between">
+                <div>
+                  <div className="flex items-start justify-between gap-2 border-b border-line/60 pb-3">
+                    <div>
+                      <h4 className="font-semibold text-slate-900 text-base">{lead.fullName}</h4>
+                      <a href={`tel:${lead.phone}`} className="inline-flex items-center gap-1.5 text-xs text-slate-600 font-mono hover:text-brand mt-0.5">
+                        <Phone className="size-3 text-slate-400" />
                         {lead.phone}
                       </a>
-                      {lead.note && (
-                        <div className="mt-1 text-xs text-slate-500 italic max-w-xs">
-                          {lead.note}
-                        </div>
-                      )}
-                    </td>
-                    <td className="hidden px-4 py-3 text-xs text-slate-600 sm:table-cell align-top">
-                      {lead.area && <span className="font-medium text-slate-800">{lead.area} · </span>}
-                      <span>{lead.address}</span>
-                    </td>
-                    <td className="hidden px-4 py-3 text-xs md:table-cell align-top">
-                      <div className="font-medium text-slate-900">
-                        {lead.requestedPackageName ?? t.leads.anyPackage}
+                    </div>
+                    <Badge tone={TONES[lead.status]}>{t.enums.leadStatus[lead.status]}</Badge>
+                  </div>
+
+                  <div className="mt-3 space-y-2 text-xs">
+                    <div className="flex items-start gap-2 text-slate-600">
+                      <MapPin className="size-3.5 text-slate-400 mt-0.5 shrink-0" />
+                      <div>
+                        {lead.area && <span className="font-medium text-slate-800">{lead.area} · </span>}
+                        <span>{lead.address}</span>
                       </div>
-                      <div className="text-slate-500">
-                        {t.enums.connectionType[lead.connectionType]}
+                    </div>
+
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <Wifi className="size-3.5 text-slate-400 shrink-0" />
+                      <span>
+                        <span className="font-medium text-slate-800">{lead.requestedPackageName ?? t.leads.anyPackage}</span>
+                        {' · '}
+                        <span className="text-slate-500">{t.enums.connectionType[lead.connectionType]}</span>
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <User className="size-3.5 text-slate-400 shrink-0" />
+                      <span>
+                        {t.leads.submittedBy}: <span className="font-medium text-slate-700">{lead.createdByName}</span>
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-slate-500">
+                      <Calendar className="size-3.5 text-slate-400 shrink-0" />
+                      <span>{formatDateTime(lead.createdAt, language)}</span>
+                    </div>
+
+                    {lead.note && (
+                      <div className="mt-2 rounded bg-slate-50 p-2 text-slate-600 italic border border-slate-100">
+                        {lead.note}
                       </div>
-                    </td>
-                    <td className="hidden px-4 py-3 text-xs text-slate-600 lg:table-cell align-top">
-                      {lead.createdByName}
-                    </td>
-                    <td className="px-4 py-3 align-top">
-                      <Badge tone={TONES[lead.status]}>{t.enums.leadStatus[lead.status]}</Badge>
-                      {lead.rejectReason && (
-                        <p className="mt-1 text-xs text-red-600 max-w-xs">{lead.rejectReason}</p>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-right align-top whitespace-nowrap">
-                      {canReview && lead.status === 'PENDING' && (
-                        <div className="flex items-center justify-end gap-1.5">
-                          <Button
-                            size="sm"
-                            className="h-8 bg-emerald-600 px-2.5 text-xs text-white hover:bg-emerald-700 font-medium"
-                            onClick={() => {
-                              setRejecting(null);
-                              setApproving(lead);
-                            }}
-                          >
-                            <Check className="mr-1 size-3.5" aria-hidden="true" />
-                            {t.leads.approve}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8 border-red-200 px-2.5 text-xs font-medium text-red-600 hover:border-red-300 hover:bg-red-50 hover:text-red-700"
-                            onClick={() => {
-                              setApproving(null);
-                              setRejecting(lead);
-                            }}
-                          >
-                            <X className="mr-1 size-3.5" aria-hidden="true" />
-                            {t.leads.reject}
-                          </Button>
-                        </div>
-                      )}
-                      {lead.customerId && (
-                        <Link
-                          className="inline-flex items-center gap-1 text-xs font-medium text-brand hover:underline"
-                          to={`/customers/${lead.customerId}`}
-                        >
-                          {t.leads.openCustomer} →
-                        </Link>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </Card>
+                    )}
+
+                    {lead.rejectReason && (
+                      <div className="mt-2 rounded bg-red-50 p-2 text-red-600 border border-red-100">
+                        <span className="font-medium">{t.leads.rejectReason}: </span>
+                        {lead.rejectReason}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-line/60 flex items-center justify-between gap-2">
+                  {canReview && lead.status === 'PENDING' ? (
+                    <div className="flex items-center gap-2 w-full">
+                      <Button
+                        size="sm"
+                        className="flex-1 h-8 bg-emerald-600 text-xs text-white hover:bg-emerald-700 font-medium"
+                        onClick={() => {
+                          setRejecting(null);
+                          setApproving(lead);
+                        }}
+                      >
+                        <Check className="mr-1 size-3.5" aria-hidden="true" />
+                        {t.leads.approve}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1 h-8 border-red-200 text-xs font-medium text-red-600 hover:border-red-300 hover:bg-red-50 hover:text-red-700"
+                        onClick={() => {
+                          setApproving(null);
+                          setRejecting(lead);
+                        }}
+                      >
+                        <X className="mr-1 size-3.5" aria-hidden="true" />
+                        {t.leads.reject}
+                      </Button>
+                    </div>
+                  ) : lead.customerId ? (
+                    <Link
+                      className="inline-flex items-center gap-1 text-xs font-medium text-brand hover:underline"
+                      to={`/customers/${lead.customerId}`}
+                    >
+                      {t.leads.openCustomer} →
+                    </Link>
+                  ) : (
+                    <div />
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
         <Pager pagination={list.data?.pagination} onPageChange={setPage} />
       </div>
 

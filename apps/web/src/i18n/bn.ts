@@ -515,6 +515,9 @@ export const bn: Dictionary = {
     connection: 'সংযোগ',
     actions: 'অ্যাকশন',
     date: 'তারিখ',
+    tableView: 'টেবিল ভিউ',
+    cardView: 'কার্ড ভিউ',
+    scrollHint: 'সব তথ্য দেখতে ডানে স্ক্রোল করুন →',
   },
   customers: {
     import: {
