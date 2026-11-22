@@ -65,31 +65,31 @@ export function CustomerForm({ onSubmit, onCancel, className }: CustomerFormProp
                   </div>
                   <div>
                     <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                      গ্রাহকের তথ্য
+                      {t.customers.infoSection}
                     </h4>
-                    <p className="text-[11px] text-slate-500">নাম, মোবাইল নম্বর ও ঠিকানা</p>
+                    <p className="text-[11px] text-slate-500">{t.customers.infoSectionSubtitle}</p>
                   </div>
                 </div>
 
                 <Field label={t.leads.fullName} htmlFor="c-name" error={errors.fullName && invalid}>
-                  <Input id="c-name" placeholder="যেমন: মোঃ রহিম উদ্দিন" {...register('fullName')} />
+                  <Input id="c-name" placeholder={t.customers.namePlaceholder} {...register('fullName')} />
                 </Field>
 
                 <div className="grid grid-cols-2 gap-2">
                   <Field label={t.leads.phone} htmlFor="c-phone" error={errors.phone && invalid}>
-                    <Input id="c-phone" inputMode="tel" placeholder="০১XXXXXXXXX" {...register('phone')} />
+                    <Input id="c-phone" inputMode="tel" placeholder={t.customers.phonePlaceholder} {...register('phone')} />
                   </Field>
                   <Field label={t.customers.altPhone} htmlFor="c-alt" error={errors.altPhone && invalid}>
-                    <Input id="c-alt" inputMode="tel" placeholder="বিকল্প মোবাইল" {...register('altPhone')} />
+                    <Input id="c-alt" inputMode="tel" placeholder={t.customers.altPhonePlaceholder} {...register('altPhone')} />
                   </Field>
                 </div>
 
                 <Field label={t.leads.area} htmlFor="c-area">
-                  <Input id="c-area" placeholder="যেমন: মিরপুর-১০, ঢাকা" {...register('area')} />
+                  <Input id="c-area" placeholder={t.customers.areaPlaceholder} {...register('area')} />
                 </Field>
 
                 <Field label={t.leads.address} htmlFor="c-address" error={errors.address && invalid}>
-                  <Input id="c-address" placeholder="বাসা/হোল্ডিং নম্বর, ফ্ল্যাট, রোড" {...register('address')} />
+                  <Input id="c-address" placeholder={t.customers.addressPlaceholder} {...register('address')} />
                 </Field>
               </div>
             </div>
@@ -103,9 +103,9 @@ export function CustomerForm({ onSubmit, onCancel, className }: CustomerFormProp
                   </div>
                   <div>
                     <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                      প্যাকেজ ও সংযোগ তথ্য
+                      {t.customers.connectionSection}
                     </h4>
-                    <p className="text-[11px] text-slate-500">ইন্টারনেট প্যাকেজ, PPPoE ও রাউটার</p>
+                    <p className="text-[11px] text-slate-500">{t.customers.connectionSectionSubtitle}</p>
                   </div>
                 </div>
 
@@ -126,20 +126,20 @@ export function CustomerForm({ onSubmit, onCancel, className }: CustomerFormProp
                     <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800">
                       {t.fiber.title}
                     </h4>
-                    <p className="text-[11px] text-slate-500">OLT, PON ও ONU বিবরণ</p>
+                    <p className="text-[11px] text-slate-500">{t.customers.fiberSectionSubtitle}</p>
                   </div>
                 </div>
 
                 <Field label={t.fiber.oltName} htmlFor="c-olt">
-                  <Input id="c-olt" placeholder="যেমন: Core-OLT-1" {...register('oltName')} />
+                  <Input id="c-olt" placeholder={t.customers.oltPlaceholder} {...register('oltName')} />
                 </Field>
 
                 <Field label={t.fiber.ponPort} htmlFor="c-pon">
-                  <Input id="c-pon" placeholder="যেমন: PON 1" {...register('ponPort')} />
+                  <Input id="c-pon" placeholder={t.customers.ponPlaceholder} {...register('ponPort')} />
                 </Field>
 
                 <Field label={t.fiber.onuSerial} htmlFor="c-onu">
-                  <Input id="c-onu" autoCapitalize="characters" placeholder="যেমন: ZTEG12345678" {...register('onuSerial')} />
+                  <Input id="c-onu" autoCapitalize="characters" placeholder={t.customers.onuPlaceholder} {...register('onuSerial')} />
                 </Field>
 
                 <div className="rounded-lg bg-amber-50/80 border border-amber-200/80 p-2.5 text-[11px] text-amber-900 leading-relaxed">
@@ -160,7 +160,7 @@ export function CustomerForm({ onSubmit, onCancel, className }: CustomerFormProp
               className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 shadow-sm gap-1.5"
             >
               <Check className="size-4" />
-              {isSubmitting ? t.common.loading : 'গ্রাহক সংরক্ষণ করুন'}
+              {isSubmitting ? t.common.loading : t.customers.saveCustomer}
             </Button>
           </div>
         </form>
